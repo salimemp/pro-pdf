@@ -51,7 +51,6 @@ export default function ContactPage() {
       <Header />
       
       <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="space-y-8 [data-ad-added]">
         <div className="space-y-8">
           {/* Top Ad */}
           <AdPlaceholder variant="banner" />
@@ -204,9 +203,10 @@ export default function ContactPage() {
               </div>
             </div>
           </div>
-        </div>
+          
           {/* Bottom Ad */}
           <AdPlaceholder variant="rectangle" />
+        </div>
       </main>
 
       <Footer />

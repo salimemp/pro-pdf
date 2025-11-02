@@ -112,24 +112,25 @@ export default function PricingPage() {
       <Header />
       
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div
         <div className="space-y-8">
           {/* Top Ad */}
           <AdPlaceholder variant="banner" />
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center space-y-4 mb-16"
-        >
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-            <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Choose Your Plan
-            </span>
-          </h1>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            Start free and upgrade when you need more power. No hidden fees, cancel anytime.
-          </p>
-        </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center space-y-4 mb-16"
+          >
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+              <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                Choose Your Plan
+              </span>
+            </h1>
+            <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+              Start free and upgrade when you need more power. No hidden fees, cancel anytime.
+            </p>
+          </motion.div>
 
         {/* Billing Toggle */}
         <motion.div
@@ -306,8 +307,10 @@ export default function PricingPage() {
             </div>
           </div>
         </motion.div>
+          
           {/* Bottom Ad */}
           <AdPlaceholder variant="rectangle" />
+        </div>
       </main>
 
       <Footer />

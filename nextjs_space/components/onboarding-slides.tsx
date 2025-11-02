@@ -73,7 +73,8 @@ export function OnboardingSlides() {
     // Check if user has seen onboarding
     const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeenOnboarding) {
-      setOpen(true);
+      // Show onboarding after cookie consent has been displayed
+      setTimeout(() => setOpen(true), 2000);
     }
   }, []);
 
@@ -100,10 +101,18 @@ export function OnboardingSlides() {
     handleComplete();
   };
 
+  // Prevent closing the dialog without saving the flag
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      // If trying to close, mark as complete
+      handleComplete();
+    }
+  };
+
   const slide = slides[currentSlide];
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white p-0 overflow-hidden">
         <VisuallyHidden>
           <DialogTitle>{slide.title}</DialogTitle>
