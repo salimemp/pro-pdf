@@ -9,7 +9,8 @@ import { ShareDialog } from "@/components/share-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Archive, ArrowRight, Download, Share2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Archive, ArrowRight, Download, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CompressPage() {
@@ -55,7 +56,19 @@ export default function CompressPage() {
 
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">Upload PDF File</CardTitle>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <span>Upload PDF File</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="w-4 h-4 text-slate-400" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload a single PDF file to compress</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <FileUpload
@@ -63,6 +76,7 @@ export default function CompressPage() {
                 maxFiles={1}
                 maxSize={50 * 1024 * 1024}
                 acceptedTypes={['application/pdf']}
+                allowReorder={false}
               />
             </CardContent>
           </Card>
@@ -70,72 +84,122 @@ export default function CompressPage() {
           {selectedFiles.length > 0 && (
             <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-white">Compression Settings</CardTitle>
+                <CardTitle className="text-white flex items-center space-x-2">
+                  <span>Compression Settings</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="w-4 h-4 text-slate-400" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p>Choose your preferred balance between file size and quality</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-slate-200 mb-4 block">Compression Level</Label>
                   <div className="space-y-3">
-                    <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="compression"
-                        value="low"
-                        checked={compressionLevel === 'low'}
-                        onChange={(e) => setCompressionLevel(e.target.value as 'low')}
-                        className="text-blue-600"
-                      />
-                      <div className="flex-1">
-                        <div className="text-slate-300 font-medium">Low Compression</div>
-                        <div className="text-slate-400 text-sm">Best quality, larger file size</div>
-                      </div>
-                    </label>
-                    <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="compression"
-                        value="medium"
-                        checked={compressionLevel === 'medium'}
-                        onChange={(e) => setCompressionLevel(e.target.value as 'medium')}
-                        className="text-blue-600"
-                      />
-                      <div className="flex-1">
-                        <div className="text-slate-300 font-medium">Medium Compression</div>
-                        <div className="text-slate-400 text-sm">Balanced quality and size (Recommended)</div>
-                      </div>
-                    </label>
-                    <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="compression"
-                        value="high"
-                        checked={compressionLevel === 'high'}
-                        onChange={(e) => setCompressionLevel(e.target.value as 'high')}
-                        className="text-blue-600"
-                      />
-                      <div className="flex-1">
-                        <div className="text-slate-300 font-medium">High Compression</div>
-                        <div className="text-slate-400 text-sm">Smallest file size, reduced quality</div>
-                      </div>
-                    </label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="compression"
+                              value="low"
+                              checked={compressionLevel === 'low'}
+                              onChange={(e) => setCompressionLevel(e.target.value as 'low')}
+                              className="text-blue-600"
+                            />
+                            <div className="flex-1">
+                              <div className="text-slate-300 font-medium">Low Compression</div>
+                              <div className="text-slate-400 text-sm">Best quality, larger file size</div>
+                            </div>
+                          </label>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Reduces file size by ~20-30%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="compression"
+                              value="medium"
+                              checked={compressionLevel === 'medium'}
+                              onChange={(e) => setCompressionLevel(e.target.value as 'medium')}
+                              className="text-blue-600"
+                            />
+                            <div className="flex-1">
+                              <div className="text-slate-300 font-medium">Medium Compression</div>
+                              <div className="text-slate-400 text-sm">Balanced quality and size (Recommended)</div>
+                            </div>
+                          </label>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Reduces file size by ~40-50%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <label className="flex items-center space-x-3 p-3 rounded-lg border border-slate-600 hover:bg-slate-800/50 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="compression"
+                              value="high"
+                              checked={compressionLevel === 'high'}
+                              onChange={(e) => setCompressionLevel(e.target.value as 'high')}
+                              className="text-blue-600"
+                            />
+                            <div className="flex-1">
+                              <div className="text-slate-300 font-medium">High Compression</div>
+                              <div className="text-slate-400 text-sm">Smallest file size, reduced quality</div>
+                            </div>
+                          </label>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Reduces file size by ~60-70%</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
 
-                <Button
-                  size="lg"
-                  onClick={handleCompress}
-                  disabled={isProcessing}
-                  className="w-full bg-yellow-600 hover:bg-yellow-700"
-                >
-                  {isProcessing ? (
-                    "Compressing PDF..."
-                  ) : (
-                    <>
-                      Compress PDF
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </>
-                  )}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="lg"
+                        onClick={handleCompress}
+                        disabled={isProcessing}
+                        className="w-full bg-yellow-600 hover:bg-yellow-700"
+                      >
+                        {isProcessing ? (
+                          "Compressing PDF..."
+                        ) : (
+                          <>
+                            Compress PDF
+                            <ArrowRight className="ml-2 w-4 h-4" />
+                          </>
+                        )}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Start compression with selected settings</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </CardContent>
             </Card>
           )}
@@ -154,10 +218,20 @@ export default function CompressPage() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Download className="mr-2 w-4 h-4" />
-                      Download Compressed PDF
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button className="bg-green-600 hover:bg-green-700">
+                            <Download className="mr-2 w-4 h-4" />
+                            Download Compressed PDF
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Download your compressed PDF file</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
                     <ShareDialog
                       fileName="compressed-document.pdf"
                       trigger={

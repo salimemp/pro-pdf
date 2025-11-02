@@ -8,7 +8,8 @@ import { FileUpload } from "@/components/file-upload";
 import { ShareDialog } from "@/components/share-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, ArrowRight, Download, Share2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { FileText, ArrowRight, Download, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 export default function MergePage() {
@@ -53,7 +54,19 @@ export default function MergePage() {
 
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white">Upload PDF Files</CardTitle>
+              <CardTitle className="text-white flex items-center space-x-2">
+                <span>Upload PDF Files</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Info className="w-4 h-4 text-slate-400" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Upload multiple PDF files. You can drag to reorder them before merging.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <FileUpload
@@ -61,27 +74,37 @@ export default function MergePage() {
                 maxFiles={10}
                 maxSize={50 * 1024 * 1024}
                 acceptedTypes={['application/pdf']}
+                allowReorder={true}
               />
             </CardContent>
           </Card>
 
           {selectedFiles.length >= 2 && (
             <div className="text-center">
-              <Button
-                size="lg"
-                onClick={handleMerge}
-                disabled={isProcessing}
-                className="bg-blue-600 hover:bg-blue-700 px-8 py-3"
-              >
-                {isProcessing ? (
-                  "Merging PDFs..."
-                ) : (
-                  <>
-                    Merge {selectedFiles.length} PDFs
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </>
-                )}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="lg"
+                      onClick={handleMerge}
+                      disabled={isProcessing}
+                      className="bg-blue-600 hover:bg-blue-700 px-8 py-3"
+                    >
+                      {isProcessing ? (
+                        "Merging PDFs..."
+                      ) : (
+                        <>
+                          Merge {selectedFiles.length} PDFs
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Combine all uploaded files into one PDF</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
 
@@ -93,10 +116,20 @@ export default function MergePage() {
                     Your PDFs have been merged successfully!
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button className="bg-green-600 hover:bg-green-700">
-                      <Download className="mr-2 w-4 h-4" />
-                      Download Merged PDF
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button className="bg-green-600 hover:bg-green-700">
+                            <Download className="mr-2 w-4 h-4" />
+                            Download Merged PDF
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Download your merged PDF file</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
                     <ShareDialog
                       fileName="merged-document.pdf"
                       trigger={
