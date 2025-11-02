@@ -64,6 +64,7 @@ export function PDFPreview({ file, className, showControls = true }: PDFPreviewP
         const renderContext = {
           canvasContext: context,
           viewport: viewport,
+          canvas: canvas,
         };
 
         await page.render(renderContext).promise;
@@ -142,7 +143,6 @@ export function PDFPreview({ file, className, showControls = true }: PDFPreviewP
                   src={thumbnailUrl} 
                   alt={`PDF Preview - Page ${currentPage}`}
                   className="w-full h-auto"
-                  style={{ imageRendering: 'high-quality' }}
                 />
               </div>
             </div>

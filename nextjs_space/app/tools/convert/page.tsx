@@ -200,24 +200,36 @@ export default function ConvertPage() {
             </Card>
           )}
 
-          {selectedFiles.length > 0 && conversionType && (
+          {selectedFiles.length > 0 && conversionType && !isProcessing && !downloadUrl && (
             <div className="text-center">
-              <Button
-                size="lg"
-                onClick={handleConvert}
-                disabled={isProcessing}
-                className="bg-purple-600 hover:bg-purple-700 px-8 py-3"
-              >
-                {isProcessing ? (
-                  "Converting File..."
-                ) : (
-                  <>
-                    Convert to {conversionOptions.find(opt => opt.value === conversionType)?.to}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </>
-                )}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="lg"
+                      onClick={handleConvert}
+                      disabled={isProcessing}
+                      className="bg-purple-600 hover:bg-purple-700 px-8 py-3"
+                    >
+                      Convert to {conversionOptions.find(opt => opt.value === conversionType)?.to}
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Start the conversion process</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
+          )}
+
+          {/* Batch Progress */}
+          {isProcessing && batchFiles.length > 0 && (
+            <BatchProgress
+              files={batchFiles}
+              totalProgress={totalProgress}
+              estimatedTimeRemaining={estimatedTime}
+            />
           )}
 
           {downloadUrl && (
