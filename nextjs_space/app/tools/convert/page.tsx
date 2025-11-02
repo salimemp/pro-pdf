@@ -1,16 +1,19 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileUpload } from "@/components/file-upload";
 import { ShareDialog } from "@/components/share-dialog";
+import { BatchProgress } from "@/components/batch-progress";
+import { PDFPreview } from "@/components/pdf-preview";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileImage, ArrowRight, Download, Share2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { FileImage, ArrowRight, Download, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 const conversionOptions = [
@@ -24,11 +27,34 @@ const conversionOptions = [
   { value: 'image-to-pdf', label: 'Images to PDF', from: 'Images', to: 'PDF' },
 ];
 
+interface BatchFile {
+  id: string;
+  name: string;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  progress: number;
+  error?: string;
+}
+
 export default function ConvertPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>('');
   const [conversionType, setConversionType] = useState<string>('');
+  const [batchFiles, setBatchFiles] = useState<BatchFile[]>([]);
+  const [totalProgress, setTotalProgress] = useState(0);
+  const [estimatedTime, setEstimatedTime] = useState(0);
+
+  // Update batch files when selected files change
+  useEffect(() => {
+    if (selectedFiles.length > 0 && !isProcessing) {
+      setBatchFiles(selectedFiles.map((file, index) => ({
+        id: `file-${index}`,
+        name: file.name,
+        status: 'pending' as const,
+        progress: 0,
+      })));
+    }
+  }, [selectedFiles, isProcessing]);
 
   const handleConvert = async () => {
     if (selectedFiles.length === 0) {
@@ -42,13 +68,59 @@ export default function ConvertPage() {
     }
 
     setIsProcessing(true);
+    setTotalProgress(0);
+    
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Process files sequentially with progress updates
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const fileId = `file-${i}`;
+        
+        // Update file status to processing
+        setBatchFiles(prev => prev.map(f => 
+          f.id === fileId ? { ...f, status: 'processing' as const, progress: 0 } : f
+        ));
+
+        // Simulate conversion with progress updates
+        const steps = 10;
+        for (let step = 1; step <= steps; step++) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+          const progress = (step / steps) * 100;
+          
+          setBatchFiles(prev => prev.map(f => 
+            f.id === fileId ? { ...f, progress: Math.round(progress) } : f
+          ));
+
+          // Update total progress
+          const filesCompleted = i;
+          const currentFileProgress = progress / 100;
+          const totalFiles = selectedFiles.length;
+          const overallProgress = ((filesCompleted + currentFileProgress) / totalFiles) * 100;
+          setTotalProgress(overallProgress);
+
+          // Update estimated time (rough calculation)
+          const remainingFiles = totalFiles - (filesCompleted + currentFileProgress);
+          const avgTimePerFile = 2; // seconds
+          setEstimatedTime(Math.ceil(remainingFiles * avgTimePerFile));
+        }
+
+        // Mark file as completed
+        setBatchFiles(prev => prev.map(f => 
+          f.id === fileId ? { ...f, status: 'completed' as const, progress: 100 } : f
+        ));
+      }
+
+      setTotalProgress(100);
+      setEstimatedTime(0);
       setDownloadUrl('#converted-file-download');
-      toast.success("File converted successfully!");
+      toast.success(`${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''} converted successfully!`);
     } catch (error) {
       toast.error("Failed to convert file. Please try again.");
+      setBatchFiles(prev => prev.map(f => 
+        f.status === 'processing' 
+          ? { ...f, status: 'error' as const, error: 'Conversion failed' } 
+          : f
+      ));
     } finally {
       setIsProcessing(false);
     }
