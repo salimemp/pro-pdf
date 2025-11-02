@@ -7,6 +7,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
 import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
+import { OnboardingSlides } from "@/components/onboarding-slides";
+import { CookieConsent } from "@/components/cookie-consent";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,6 +57,9 @@ export default function RootLayout({
           <Providers>
             {children}
             <Toaster />
+            <SonnerToaster position="top-right" theme="dark" richColors />
+            <OnboardingSlides />
+            <CookieConsent />
           </Providers>
         </ThemeProvider>
       </body>

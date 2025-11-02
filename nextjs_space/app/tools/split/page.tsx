@@ -5,11 +5,12 @@ import { useState } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileUpload } from "@/components/file-upload";
+import { ShareDialog } from "@/components/share-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Scissors, ArrowRight, Download } from "lucide-react";
+import { Scissors, ArrowRight, Download, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function SplitPage() {
@@ -148,6 +149,17 @@ export default function SplitPage() {
                         Download Part {index + 1}
                       </Button>
                     ))}
+                  </div>
+                  <div className="flex justify-center pt-2">
+                    <ShareDialog
+                      fileName={`split-document-parts.zip`}
+                      trigger={
+                        <Button variant="outline" className="border-green-600 text-green-400 hover:bg-green-900/20">
+                          <Share2 className="mr-2 w-4 h-4" />
+                          Share All Parts
+                        </Button>
+                      }
+                    />
                   </div>
                 </div>
               </CardContent>

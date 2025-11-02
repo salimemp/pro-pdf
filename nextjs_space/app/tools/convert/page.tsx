@@ -5,11 +5,12 @@ import { useState } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileUpload } from "@/components/file-upload";
+import { ShareDialog } from "@/components/share-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileImage, ArrowRight, Download } from "lucide-react";
+import { FileImage, ArrowRight, Download, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 const conversionOptions = [
@@ -149,15 +150,26 @@ export default function ConvertPage() {
 
           {downloadUrl && (
             <Card className="bg-green-900/20 border-green-700">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
                 <div className="space-y-4">
-                  <div className="text-green-400 text-lg font-semibold">
+                  <div className="text-center text-green-400 text-lg font-semibold">
                     Your file has been converted successfully!
                   </div>
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Download className="mr-2 w-4 h-4" />
-                    Download Converted File
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Download className="mr-2 w-4 h-4" />
+                      Download Converted File
+                    </Button>
+                    <ShareDialog
+                      fileName={`converted-${selectedFiles[0]?.name || 'document'}`}
+                      trigger={
+                        <Button variant="outline" className="border-green-600 text-green-400 hover:bg-green-900/20">
+                          <Share2 className="mr-2 w-4 h-4" />
+                          Share Document
+                        </Button>
+                      }
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

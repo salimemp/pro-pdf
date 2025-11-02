@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileUpload } from "@/components/file-upload";
+import { ShareDialog } from "@/components/share-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Archive, ArrowRight, Download } from "lucide-react";
+import { Archive, ArrowRight, Download, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CompressPage() {
@@ -141,19 +142,32 @@ export default function CompressPage() {
 
           {downloadUrl && (
             <Card className="bg-green-900/20 border-green-700">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
                 <div className="space-y-4">
-                  <div className="text-green-400 text-lg font-semibold">
-                    Your PDF has been compressed successfully!
+                  <div className="text-center">
+                    <div className="text-green-400 text-lg font-semibold">
+                      Your PDF has been compressed successfully!
+                    </div>
+                    <div className="text-slate-300 text-sm mt-2">
+                      Original size: {selectedFiles[0]?.size ? (selectedFiles[0].size / 1024 / 1024).toFixed(2) : '0'} MB
+                      → Compressed size: ~{selectedFiles[0]?.size ? ((selectedFiles[0].size * 0.6) / 1024 / 1024).toFixed(2) : '0'} MB
+                    </div>
                   </div>
-                  <div className="text-slate-300 text-sm">
-                    Original size: {selectedFiles[0]?.size ? (selectedFiles[0].size / 1024 / 1024).toFixed(2) : '0'} MB
-                    → Compressed size: ~{selectedFiles[0]?.size ? ((selectedFiles[0].size * 0.6) / 1024 / 1024).toFixed(2) : '0'} MB
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      <Download className="mr-2 w-4 h-4" />
+                      Download Compressed PDF
+                    </Button>
+                    <ShareDialog
+                      fileName="compressed-document.pdf"
+                      trigger={
+                        <Button variant="outline" className="border-green-600 text-green-400 hover:bg-green-900/20">
+                          <Share2 className="mr-2 w-4 h-4" />
+                          Share Document
+                        </Button>
+                      }
+                    />
                   </div>
-                  <Button className="bg-green-600 hover:bg-green-700">
-                    <Download className="mr-2 w-4 h-4" />
-                    Download Compressed PDF
-                  </Button>
                 </div>
               </CardContent>
             </Card>
