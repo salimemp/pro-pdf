@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   FileText, 
@@ -117,6 +118,9 @@ export default function HelpPage() {
       
       <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-12">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Help Center
@@ -252,6 +256,9 @@ export default function HelpPage() {
               </CardContent>
             </Card>
           </section>
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

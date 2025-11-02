@@ -1,6 +1,7 @@
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Shield, Zap, Users, Award } from "lucide-react";
 
 export default function AboutPage() {
@@ -10,6 +11,9 @@ export default function AboutPage() {
       
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               About PRO PDF
@@ -110,6 +114,9 @@ export default function AboutPage() {
               </a>
             </div>
           </div>
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

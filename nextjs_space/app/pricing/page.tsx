@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from "react";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
@@ -112,6 +113,9 @@ export default function PricingPage() {
       
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
         <motion.div
+        <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -302,6 +306,8 @@ export default function PricingPage() {
             </div>
           </div>
         </motion.div>
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
       </main>
 
       <Footer />

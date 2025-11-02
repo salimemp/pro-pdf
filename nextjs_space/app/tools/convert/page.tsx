@@ -2,19 +2,33 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Header } from "@/components/header";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Footer } from "@/components/footer";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { FileUpload } from "@/components/file-upload";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { ShareDialog } from "@/components/share-dialog";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { BatchProgress } from "@/components/batch-progress";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { PDFPreview } from "@/components/pdf-preview";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Button } from "@/components/ui/button";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Label } from "@/components/ui/label";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { FileImage, ArrowRight, Download, Share2, Info } from "lucide-react";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { toast } from "sonner";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 
 const conversionOptions = [
   { value: 'pdf-to-word', label: 'PDF to Word (DOCX)', from: 'PDF', to: 'Word' },
@@ -149,6 +163,9 @@ export default function ConvertPage() {
       
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-3">
               <FileImage className="w-8 h-8 text-purple-400" />
@@ -258,6 +275,9 @@ export default function ConvertPage() {
               </CardContent>
             </Card>
           )}
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

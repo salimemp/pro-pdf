@@ -2,15 +2,25 @@
 'use client';
 
 import { useState } from 'react';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Header } from '@/components/header';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Footer } from '@/components/footer';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { FileUpload } from '@/components/file-upload';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { SignaturePad } from '@/components/signature-pad';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { ShareDialog } from '@/components/share-dialog';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Button } from '@/components/ui/button';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { FileSignature, Download, Share2 } from 'lucide-react';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { toast } from 'sonner';
+import { AdPlaceholder } from "@/components/ad-placeholder";
 
 export default function SignPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -48,6 +58,9 @@ export default function SignPage() {
 
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-3">
               <FileSignature className="w-8 h-8 text-purple-400" />
@@ -129,6 +142,9 @@ export default function SignPage() {
               </CardContent>
             </Card>
           )}
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

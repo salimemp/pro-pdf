@@ -1,5 +1,6 @@
 
 import { Header } from "@/components/header";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Footer } from "@/components/footer";
 
 export default function PrivacyPage() {
@@ -9,6 +10,9 @@ export default function PrivacyPage() {
       
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+        <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
           <h1 className="text-3xl font-bold text-white mb-8">Privacy Policy</h1>
           
           <div className="space-y-6 text-slate-300 prose prose-invert max-w-none">
@@ -87,6 +91,8 @@ export default function PrivacyPage() {
             </section>
           </div>
         </div>
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
       </main>
 
       <Footer />

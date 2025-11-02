@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { FileUpload } from "@/components/file-upload";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { 
   FileText, 
   Scissors, 
@@ -83,6 +84,10 @@ export function DashboardContent() {
       <Header />
       
       <main className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Top Banner Ad */}
+        <div className="mb-6">
+          <AdPlaceholder variant="banner" />
+        </div>
         {/* Welcome Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -270,6 +275,11 @@ export function DashboardContent() {
             </Button>
           </motion.div>
         )}
+
+        {/* Bottom Ad */}
+        <div className="mt-8">
+          <AdPlaceholder variant="rectangle" />
+        </div>
 
         {/* Quick Access Sidebar */}
         <div className="fixed right-4 top-1/2 transform -translate-y-1/2 space-y-2 hidden xl:block">

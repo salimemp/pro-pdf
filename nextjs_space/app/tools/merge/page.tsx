@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { FileUpload } from "@/components/file-upload";
 import { ShareDialog } from "@/components/share-dialog";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -42,6 +43,9 @@ export default function MergePage() {
       
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-3">
               <FileText className="w-8 h-8 text-blue-400" />
@@ -144,6 +148,9 @@ export default function MergePage() {
               </CardContent>
             </Card>
           )}
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

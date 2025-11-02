@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from "react";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,10 @@ export default function ContactPage() {
       <Header />
       
       <main className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
+        <div className="space-y-8 [data-ad-added]">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
               Get in Touch
@@ -201,6 +205,8 @@ export default function ContactPage() {
             </div>
           </div>
         </div>
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
       </main>
 
       <Footer />

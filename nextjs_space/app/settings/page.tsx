@@ -1,6 +1,7 @@
 'use client';
 
 import { Header } from "@/components/header";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Footer } from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,9 @@ export default function SettingsPage() {
       
       <main className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-8">
+          {/* Top Ad */}
+          <AdPlaceholder variant="banner" />
+          
           {/* Page Header */}
           <div className="text-center space-y-4">
             <div className="flex items-center justify-center space-x-3">
@@ -191,6 +195,9 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           )}
+          
+          {/* Bottom Ad */}
+          <AdPlaceholder variant="rectangle" />
         </div>
       </main>
 

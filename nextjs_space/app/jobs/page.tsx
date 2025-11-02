@@ -1,5 +1,6 @@
 
 import { getServerSession } from "next-auth";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { JobsContent } from "@/components/jobs/jobs-content";

@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Header } from "@/components/header";
+import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
