@@ -20,7 +20,8 @@ import {
   Upload,
   History,
   Settings,
-  BarChart3
+  BarChart3,
+  Clock
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -276,6 +277,16 @@ export function DashboardContent() {
             variant="outline"
             size="icon"
             className="bg-slate-800/50 border-slate-600 hover:bg-slate-700"
+            onClick={() => window.location.href = '/jobs'}
+            title="Job Queue"
+          >
+            <Clock className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-slate-800/50 border-slate-600 hover:bg-slate-700"
+            title="History"
           >
             <History className="w-4 h-4" />
           </Button>
@@ -283,6 +294,7 @@ export function DashboardContent() {
             variant="outline"
             size="icon"
             className="bg-slate-800/50 border-slate-600 hover:bg-slate-700"
+            title="Analytics"
           >
             <BarChart3 className="w-4 h-4" />
           </Button>
@@ -290,6 +302,8 @@ export function DashboardContent() {
             variant="outline"
             size="icon"
             className="bg-slate-800/50 border-slate-600 hover:bg-slate-700"
+            onClick={() => window.location.href = '/settings'}
+            title="Settings"
           >
             <Settings className="w-4 h-4" />
           </Button>

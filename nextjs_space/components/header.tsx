@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { FileText, Menu, X, User, LogOut, Settings } from "lucide-react";
+import { FileText, Menu, X, User, LogOut, Settings, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -44,9 +44,14 @@ export function Header() {
                 Pricing
               </Link>
               {session && (
-                <Link href="/dashboard" className="text-slate-300 hover:text-blue-400 transition-colors">
-                  Dashboard
-                </Link>
+                <>
+                  <Link href="/dashboard" className="text-slate-300 hover:text-blue-400 transition-colors">
+                    Dashboard
+                  </Link>
+                  <Link href="/jobs" className="text-slate-300 hover:text-blue-400 transition-colors">
+                    Jobs
+                  </Link>
+                </>
               )}
             </nav>
 
@@ -83,6 +88,12 @@ export function Header() {
                       <Link href="/dashboard" className="flex items-center">
                         <User className="mr-2 h-4 w-4" />
                         Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/jobs" className="flex items-center">
+                        <Clock className="mr-2 h-4 w-4" />
+                        Jobs Queue
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
@@ -149,13 +160,22 @@ export function Header() {
                 Pricing
               </Link>
               {session && (
-                <Link
-                  href="/dashboard"
-                  className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/jobs"
+                    className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Jobs
+                  </Link>
+                </>
               )}
               {!session && (
                 <div className="flex flex-col space-y-2 px-3 pt-2">

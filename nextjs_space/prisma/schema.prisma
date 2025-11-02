@@ -62,6 +62,7 @@ model User {
   files            File[]
   conversionHistory ConversionHistory[]
   subscriptions    Subscription[]
+  jobs             Job[]
 }
 
 model VerificationToken {
@@ -120,4 +121,38 @@ model Subscription {
   updatedAt         DateTime @updatedAt
   
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String   // User-friendly job name
+  type          String   // merge, split, compress, convert, sign, encrypt
+  status        String   @default("pending") // pending, processing, completed, failed, scheduled
+  priority      String   @default("medium") // low, medium, high, urgent
+  progress      Int      @default(0) // 0-100
+  
+  // Recurrence Settings
+  isRecurring   Boolean  @default(false)
+  recurrence    String?  // daily, weekly, monthly, custom
+  nextRunAt     DateTime?
+  lastRunAt     DateTime?
+  
+  // Job Configuration
+  inputFiles    Json     // Array of file IDs or paths
+  outputFiles   Json?    // Array of result file paths
+  settings      Json     // Tool-specific settings (compression level, split ranges, etc.)
+  
+  // Metadata
+  errorMessage  String?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, status])
+  @@index([userId, createdAt])
+  @@index([nextRunAt])
 }
