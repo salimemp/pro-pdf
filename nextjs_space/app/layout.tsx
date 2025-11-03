@@ -50,14 +50,14 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
           <Providers>
             {children}
             <Toaster />
-            <SonnerToaster position="top-right" theme="dark" richColors />
+            <SonnerToaster position="top-right" richColors />
             <OnboardingSlides />
             <CookieConsent />
           </Providers>

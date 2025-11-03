@@ -17,6 +17,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { EncryptionManager } from "@/components/encryption-manager";
 import { retrieveKeyFromBrowser } from "@/lib/encryption";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   const { data: session, status } = useSession() || {};
@@ -75,7 +76,10 @@ export function Header() {
             </nav>
 
             {/* User Actions */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
               {/* Encryption Toggle */}
               <TooltipProvider>
                 <Tooltip>
