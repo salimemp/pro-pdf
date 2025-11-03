@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
@@ -71,13 +71,51 @@ const pdfTools = [
   }
 ];
 
+interface UserStats {
+  filesProcessed: number;
+  filesThisMonth: number;
+  storageUsedGB: number;
+  storagePercentage: number;
+  storageLimit: number;
+  timeSavedHours: number;
+}
+
 export function DashboardContent() {
   const { data: session } = useSession() || {};
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
 
   const isPremium = (session?.user as any)?.isPremium;
   const maxFileSize = isPremium ? 1024 * 1024 * 1024 : 10 * 1024 * 1024; // 1GB vs 10MB
+
+  // Fetch user stats
+  useEffect(() => {
+    if (session && isPremium) {
+      fetchUserStats();
+    }
+  }, [session, isPremium]);
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch('/api/user/stats');
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+      // Set default stats on error
+      setStats({
+        filesProcessed: 0,
+        filesThisMonth: 0,
+        storageUsedGB: 0,
+        storagePercentage: 0,
+        storageLimit: 10,
+        timeSavedHours: 0
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -130,8 +168,12 @@ export function DashboardContent() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-white">127</div>
-                  <p className="text-xs text-green-400">+12 this month</p>
+                  <div className="text-2xl font-bold text-white">
+                    {stats?.filesProcessed || 0}
+                  </div>
+                  <p className="text-xs text-green-400">
+                    +{stats?.filesThisMonth || 0} this month
+                  </p>
                 </CardContent>
               </Card>
               
@@ -142,9 +184,16 @@ export function DashboardContent() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-white">2.4 GB</div>
-                  <Progress value={24} className="mt-2 h-1" />
-                  <p className="text-xs text-slate-400 mt-1">24% of 10GB</p>
+                  <div className="text-2xl font-bold text-white">
+                    {stats?.storageUsedGB?.toFixed(1) || 0} GB
+                  </div>
+                  <Progress 
+                    value={stats?.storagePercentage || 0} 
+                    className="mt-2 h-1" 
+                  />
+                  <p className="text-xs text-slate-400 mt-1">
+                    {stats?.storagePercentage || 0}% of {stats?.storageLimit || 10}GB
+                  </p>
                 </CardContent>
               </Card>
               
@@ -155,7 +204,9 @@ export function DashboardContent() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-white">47h</div>
+                  <div className="text-2xl font-bold text-white">
+                    {stats?.timeSavedHours || 0}h
+                  </div>
                   <p className="text-xs text-blue-400">This month</p>
                 </CardContent>
               </Card>

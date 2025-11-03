@@ -21,12 +21,22 @@ export function CookieConsent() {
   }, []);
 
   const handleAccept = () => {
-    Cookies.set('cookie-consent', 'accepted', { expires: 365 });
+    Cookies.set('cookie-consent', 'accepted', { 
+      expires: 365,
+      secure: true,
+      sameSite: 'strict',
+      path: '/'
+    });
     setShow(false);
   };
 
   const handleDecline = () => {
-    Cookies.set('cookie-consent', 'declined', { expires: 365 });
+    Cookies.set('cookie-consent', 'declined', { 
+      expires: 365,
+      secure: true,
+      sameSite: 'strict',
+      path: '/'
+    });
     setShow(false);
   };
 
