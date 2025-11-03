@@ -4,14 +4,16 @@
 import { useState } from "react";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { FileUpload } from "@/components/file-upload";
+import { EncryptedFileUpload } from "@/components/encrypted-file-upload";
+import { RealtimeProgressIndicator } from "@/components/realtime-progress-indicator";
 import { ShareDialog } from "@/components/share-dialog";
 import { AdPlaceholder } from "@/components/ad-placeholder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Archive, ArrowRight, Download, Share2, Info } from "lucide-react";
+import { Archive, ArrowRight, Download, Share2, Info, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CompressPage() {
@@ -19,6 +21,9 @@ export default function CompressPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>('');
   const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high'>('medium');
+  const [enableEncryption, setEnableEncryption] = useState(false);
+  const [currentJobId, setCurrentJobId] = useState<string | null>(null);
+  const [showProgress, setShowProgress] = useState(false);
 
   const handleCompress = async () => {
     if (selectedFiles.length === 0) {
@@ -27,15 +32,61 @@ export default function CompressPage() {
     }
 
     setIsProcessing(true);
+    setShowProgress(true);
+    
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setDownloadUrl('#compressed-pdf-download');
-      toast.success("PDF compressed successfully!");
+      // Create a job for compression
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `Compress ${selectedFiles[0].name}`,
+          type: 'compress',
+          inputFiles: selectedFiles.map(f => f.name),
+          settings: { compressionLevel, encrypted: enableEncryption },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create job');
+      }
+
+      const job = await response.json();
+      setCurrentJobId(job.id);
+
+      // Simulate progress updates (in real implementation, this would be handled by the server)
+      let progress = 0;
+      const updateInterval = setInterval(async () => {
+        progress += Math.random() * 15 + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(updateInterval);
+          
+          // Update job to completed
+          await fetch(`/api/jobs/${job.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'completed', progress: 100 }),
+          });
+          
+          setDownloadUrl('#compressed-pdf-download');
+          setShowProgress(false);
+          toast.success("PDF compressed successfully!");
+          setIsProcessing(false);
+        } else {
+          await fetch(`/api/jobs/${job.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ progress: Math.round(progress), status: 'processing' }),
+          });
+        }
+      }, 500);
+
     } catch (error) {
+      console.error('Compression error:', error);
       toast.error("Failed to compress PDF. Please try again.");
-    } finally {
       setIsProcessing(false);
+      setShowProgress(false);
     }
   };
 
@@ -60,30 +111,68 @@ export default function CompressPage() {
 
           <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
-              <CardTitle className="text-white flex items-center space-x-2">
-                <span>Upload PDF File</span>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Info className="w-4 h-4 text-slate-400" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Upload a single PDF file to compress</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <CardTitle className="text-white flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <span>Upload PDF File</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Info className="w-4 h-4 text-slate-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Upload a single PDF file to compress</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                
+                {/* Encryption Toggle */}
+                <div className="flex items-center space-x-2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center space-x-2">
+                          <Lock className="w-4 h-4 text-blue-400" />
+                          <Label htmlFor="encryption-toggle" className="text-sm text-slate-300 cursor-pointer">
+                            Enable Encryption
+                          </Label>
+                          <Switch
+                            id="encryption-toggle"
+                            checked={enableEncryption}
+                            onCheckedChange={setEnableEncryption}
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Enable client-side zero-knowledge encryption</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <FileUpload
+              <EncryptedFileUpload
                 onFilesSelected={setSelectedFiles}
                 maxFiles={1}
                 maxSize={50 * 1024 * 1024}
                 acceptedTypes={['application/pdf']}
                 allowReorder={false}
+                enableEncryption={enableEncryption}
               />
             </CardContent>
           </Card>
+
+          {/* Real-time Progress Indicator */}
+          {showProgress && currentJobId && (
+            <RealtimeProgressIndicator
+              jobId={currentJobId}
+              fileName={selectedFiles[0]?.name}
+              onComplete={() => {
+                setShowProgress(false);
+              }}
+            />
+          )}
 
           {selectedFiles.length > 0 && (
             <Card className="bg-slate-800/50 border-slate-700">

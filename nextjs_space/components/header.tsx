@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { FileText, Menu, X, User, LogOut, Settings, Clock } from "lucide-react";
+import { FileText, Menu, X, User, LogOut, Settings, Clock, Shield } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -14,10 +14,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { EncryptionManager } from "@/components/encryption-manager";
+import { retrieveKeyFromBrowser } from "@/lib/encryption";
 
 export function Header() {
   const { data: session, status } = useSession() || {};
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showEncryptionManager, setShowEncryptionManager] = useState(false);
+  const [hasEncryptionKey, setHasEncryptionKey] = useState(false);
+
+  useEffect(() => {
+    checkForEncryptionKey();
+  }, []);
+
+  const checkForEncryptionKey = async () => {
+    const keyId = localStorage.getItem('current_encryption_key_id');
+    if (keyId) {
+      const key = await retrieveKeyFromBrowser(keyId);
+      if (key) {
+        setHasEncryptionKey(true);
+      }
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full bg-slate-950/80 backdrop-blur-lg border-b border-slate-800">
@@ -57,6 +76,28 @@ export function Header() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-4">
+              {/* Encryption Toggle */}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowEncryptionManager(true)}
+                      className="relative"
+                    >
+                      <Shield className={hasEncryptionKey ? "h-5 w-5 text-blue-400" : "h-5 w-5 text-slate-400"} />
+                      {hasEncryptionKey && (
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{hasEncryptionKey ? 'Encryption Active' : 'Enable Encryption'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               {status === "loading" ? (
                 <div className="w-8 h-8 bg-slate-800 rounded-full animate-pulse" />
               ) : session ? (
@@ -191,6 +232,16 @@ export function Header() {
           </div>
         )}
       </div>
+
+      {/* Encryption Manager Dialog */}
+      <EncryptionManager
+        open={showEncryptionManager}
+        onOpenChange={setShowEncryptionManager}
+        onKeyReady={() => {
+          setHasEncryptionKey(true);
+          checkForEncryptionKey();
+        }}
+      />
     </header>
   );
 }
