@@ -20,7 +20,8 @@ import { PDFProcessor } from "@/lib/pdf-utils";
 
 const conversionOptions = [
   { value: 'image-to-pdf', label: 'Images to PDF (Recommended)', from: 'Images', to: 'PDF', supported: true },
-  { value: 'pdf-to-image', label: 'PDF to Images (PNG) - Coming Soon', from: 'PDF', to: 'Images', supported: false },
+  { value: 'pdf-to-image', label: 'PDF to Images (PNG)', from: 'PDF', to: 'Images', supported: true },
+  { value: 'pdf-to-text', label: 'PDF to Text', from: 'PDF', to: 'Text', supported: true },
   { value: 'pdf-to-word', label: 'PDF to Word (DOCX) - Coming Soon', from: 'PDF', to: 'Word', supported: false },
   { value: 'pdf-to-excel', label: 'PDF to Excel (XLSX) - Coming Soon', from: 'PDF', to: 'Excel', supported: false },
   { value: 'pdf-to-powerpoint', label: 'PDF to PowerPoint (PPTX) - Coming Soon', from: 'PDF', to: 'PowerPoint', supported: false },
@@ -46,6 +47,8 @@ export default function ConvertPage() {
   const [totalProgress, setTotalProgress] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState(0);
   const [convertedPdfBlob, setConvertedPdfBlob] = useState<Blob | null>(null);
+  const [convertedImages, setConvertedImages] = useState<Blob[]>([]);
+  const [extractedText, setExtractedText] = useState<string>('');
 
   // Update batch files when selected files change
   useEffect(() => {
@@ -74,16 +77,22 @@ export default function ConvertPage() {
     
     // Check if conversion type is supported
     if (!selectedOption?.supported) {
-      toast.error("This conversion type is coming soon. Please try Images to PDF instead.");
+      toast.error("This conversion type is coming soon. Please try the supported conversions instead.");
       return;
     }
 
     setIsProcessing(true);
     setTotalProgress(0);
     
+    // Reset previous results
+    setConvertedPdfBlob(null);
+    setConvertedImages([]);
+    setExtractedText('');
+    setDownloadUrl('');
+    
     try {
       if (conversionType === 'image-to-pdf') {
-        // Use real image-to-PDF conversion
+        // Convert images to PDF
         setTotalProgress(30);
         
         const convertedBytes = await PDFProcessor.imagesToPDF(selectedFiles);
@@ -99,6 +108,36 @@ export default function ConvertPage() {
         setTotalProgress(100);
         
         toast.success(`${selectedFiles.length} image${selectedFiles.length > 1 ? 's' : ''} converted to PDF successfully!`);
+      } else if (conversionType === 'pdf-to-image') {
+        // Convert PDF to images
+        setTotalProgress(20);
+        
+        const images = await PDFProcessor.pdfToImages(selectedFiles[0]);
+        
+        setTotalProgress(80);
+        
+        setConvertedImages(images);
+        setTotalProgress(100);
+        
+        toast.success(`PDF converted to ${images.length} image${images.length > 1 ? 's' : ''} successfully!`);
+      } else if (conversionType === 'pdf-to-text') {
+        // Extract text from PDF
+        setTotalProgress(20);
+        
+        const text = await PDFProcessor.extractTextFromPDF(selectedFiles[0]);
+        
+        setTotalProgress(80);
+        
+        setExtractedText(text);
+        
+        // Create text file blob
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        
+        setDownloadUrl(url);
+        setTotalProgress(100);
+        
+        toast.success(`Text extracted from PDF successfully!`);
       } else {
         // For unsupported conversions (shouldn't reach here due to earlier check)
         throw new Error('Unsupported conversion type');
@@ -117,14 +156,49 @@ export default function ConvertPage() {
   };
 
   const handleDownload = () => {
-    if (!downloadUrl || !convertedPdfBlob) return;
+    if (conversionType === 'image-to-pdf' && downloadUrl && convertedPdfBlob) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `converted-${Date.now()}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (conversionType === 'pdf-to-text' && downloadUrl) {
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `extracted-text-${Date.now()}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleDownloadAllImages = () => {
+    if (convertedImages.length === 0) return;
     
+    convertedImages.forEach((blob, index) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `page-${index + 1}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    });
+    
+    toast.success(`${convertedImages.length} images downloaded!`);
+  };
+
+  const handleDownloadSingleImage = (blob: Blob, index: number) => {
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `converted-${Date.now()}.pdf`;
+    link.href = url;
+    link.download = `page-${index + 1}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const getAcceptedTypes = () => {
@@ -236,27 +310,94 @@ export default function ConvertPage() {
             />
           )}
 
-          {downloadUrl && (
+          {/* Results for Image-to-PDF and PDF-to-Text */}
+          {(downloadUrl && (conversionType === 'image-to-pdf' || conversionType === 'pdf-to-text')) && (
             <Card className="bg-green-900/20 border-green-700">
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="text-center text-green-400 text-lg font-semibold">
                     Your file has been converted successfully!
                   </div>
+                  
+                  {/* Show text preview for PDF-to-Text */}
+                  {conversionType === 'pdf-to-text' && extractedText && (
+                    <div className="bg-slate-900/50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                      <pre className="text-slate-300 text-sm whitespace-pre-wrap font-mono">
+                        {extractedText.slice(0, 1000)}
+                        {extractedText.length > 1000 && '...'}
+                      </pre>
+                      {extractedText.length > 1000 && (
+                        <p className="text-slate-400 text-sm mt-2 italic">
+                          Showing first 1000 characters. Download the full text file to view all content.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
                       <Download className="mr-2 w-4 h-4" />
-                      Download Converted File
+                      Download {conversionType === 'pdf-to-text' ? 'Text File' : 'PDF'}
                     </Button>
-                    <ShareDialog
-                      fileName={`converted-${selectedFiles[0]?.name || 'document'}`}
-                      trigger={
-                        <Button variant="outline" className="border-green-600 text-green-400 hover:bg-green-900/20">
-                          <Share2 className="mr-2 w-4 h-4" />
-                          Share Document
-                        </Button>
-                      }
-                    />
+                    {conversionType === 'image-to-pdf' && (
+                      <ShareDialog
+                        fileName={`converted-${selectedFiles[0]?.name || 'document'}`}
+                        trigger={
+                          <Button variant="outline" className="border-green-600 text-green-400 hover:bg-green-900/20">
+                            <Share2 className="mr-2 w-4 h-4" />
+                            Share Document
+                          </Button>
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Results for PDF-to-Images */}
+          {(convertedImages.length > 0 && conversionType === 'pdf-to-image') && (
+            <Card className="bg-green-900/20 border-green-700">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="text-center text-green-400 text-lg font-semibold">
+                    PDF converted to {convertedImages.length} image{convertedImages.length > 1 ? 's' : ''}!
+                  </div>
+                  
+                  <div className="text-center">
+                    <Button onClick={handleDownloadAllImages} className="bg-green-600 hover:bg-green-700">
+                      <Download className="mr-2 w-4 h-4" />
+                      Download All Images ({convertedImages.length})
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                    {convertedImages.map((blob, index) => {
+                      const url = URL.createObjectURL(blob);
+                      return (
+                        <div key={index} className="relative group">
+                          <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-600">
+                            <img 
+                              src={url} 
+                              alt={`Page ${index + 1}`} 
+                              className="w-full h-auto rounded"
+                            />
+                            <div className="mt-2 flex items-center justify-between">
+                              <span className="text-slate-300 text-sm">Page {index + 1}</span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadSingleImage(blob, index)}
+                                className="border-green-600 text-green-400 hover:bg-green-900/20"
+                              >
+                                <Download className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </CardContent>

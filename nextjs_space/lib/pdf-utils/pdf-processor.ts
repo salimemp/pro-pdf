@@ -390,4 +390,96 @@ export class PDFProcessor {
       throw new Error(`Failed to convert images to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  /**
+   * Convert PDF to images (PNG format)
+   */
+  static async pdfToImages(pdfFile: File, scale: number = 2.0): Promise<Blob[]> {
+    try {
+      // Dynamic import for pdfjs
+      const pdfjsLib = await import('pdfjs-dist');
+      
+      // Set worker path
+      if (typeof window !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+      }
+
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      
+      const images: Blob[] = [];
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale });
+
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Could not get canvas context');
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // Render page to canvas
+        await page.render({
+          canvasContext: context,
+          viewport: viewport,
+        }).promise;
+
+        // Convert canvas to blob
+        const blob = await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Failed to create blob'));
+          }, 'image/png');
+        });
+
+        images.push(blob);
+      }
+
+      return images;
+    } catch (error) {
+      console.error('Error converting PDF to images:', error);
+      throw new Error(`Failed to convert PDF to images: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Extract text from PDF
+   */
+  static async extractTextFromPDF(pdfFile: File): Promise<string> {
+    try {
+      // Dynamic import for pdfjs
+      const pdfjsLib = await import('pdfjs-dist');
+      
+      // Set worker path
+      if (typeof window !== 'undefined') {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+      }
+
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      
+      let fullText = '';
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        
+        fullText += `\n--- Page ${pageNum} ---\n${pageText}\n`;
+      }
+
+      return fullText.trim();
+    } catch (error) {
+      console.error('Error extracting text from PDF:', error);
+      throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }

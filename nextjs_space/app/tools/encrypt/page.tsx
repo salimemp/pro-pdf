@@ -17,6 +17,7 @@ import { Shield, ArrowRight, Download, Share2, Info, Eye, EyeOff, Lock } from "l
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PDFProcessor } from "@/lib/pdf-utils";
+import { generatePasswordKey, encryptFile, createEncryptedBundle } from "@/lib/encryption";
 
 export default function EncryptPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -54,30 +55,55 @@ export default function EncryptPage() {
 
     setIsProcessing(true);
     try {
-      // Note: Password encryption feature is coming soon
-      // For now, we process and optimize the PDF
-      const encryptedBytes = await PDFProcessor.encryptPDF(
+      // Generate a salt for password-based key derivation
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      
+      // Use the user password for encryption (owner password can be used for additional features)
+      const encryptionKey = await generatePasswordKey(userPassword, salt);
+      
+      // Encrypt the PDF file
+      const { encryptedData, iv, fileName } = await encryptFile(
         selectedFiles[0],
-        ownerPassword,
-        userPassword,
-        {
+        encryptionKey,
+        (progress) => {
+          // Optional: update progress indicator
+          console.log(`Encryption progress: ${progress}%`);
+        }
+      );
+      
+      // Create metadata
+      const metadata = {
+        fileName: selectedFiles[0].name,
+        fileType: 'application/pdf',
+        fileSize: selectedFiles[0].size,
+        permissions: {
           printing: allowPrinting,
           modifying: allowEditing,
           copying: allowCopying,
           annotating: allowAnnotations,
-        }
-      );
-
-      // Create blob and download URL
-      const blob = new Blob([encryptedBytes], { type: 'application/pdf' });
+        },
+        encrypted: true,
+        encryptionMethod: 'AES-256-GCM',
+      };
+      
+      // Create encrypted bundle with salt, IV, and metadata
+      const bundle = createEncryptedBundle(encryptedData, iv, metadata);
+      
+      // Prepend salt to bundle (needed for decryption)
+      const finalBundle = new Uint8Array(salt.length + bundle.byteLength);
+      finalBundle.set(salt, 0);
+      finalBundle.set(new Uint8Array(bundle), salt.length);
+      
+      // Create blob with custom extension to indicate it's encrypted
+      const blob = new Blob([finalBundle], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       
       setEncryptedPdfBlob(blob);
       setDownloadUrl(url);
-      toast.success("PDF processed successfully! Note: Password encryption feature is coming soon.");
+      toast.success("PDF encrypted successfully with AES-256 encryption!");
     } catch (error) {
       console.error('Encryption error:', error);
-      toast.error("Failed to process PDF. Please try again.");
+      toast.error("Failed to encrypt PDF. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -88,7 +114,10 @@ export default function EncryptPage() {
     
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = `encrypted-${selectedFiles[0]?.name || 'document.pdf'}`;
+    // Use .encrypted extension to indicate the file is encrypted
+    const originalName = selectedFiles[0]?.name || 'document.pdf';
+    const nameWithoutExt = originalName.replace(/\.[^/.]+$/, '');
+    link.download = `${nameWithoutExt}.encrypted.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
