@@ -71,9 +71,29 @@ export async function PATCH(
 
     const data = await req.json();
     
+    // Whitelist allowed fields for security
+    const allowedFields = ['status', 'priority', 'schedule', 'progress', 'result'];
+    const updateData: any = {};
+    
+    for (const field of allowedFields) {
+      if (field in data) {
+        updateData[field] = data[field];
+      }
+    }
+    
+    // Validate status if provided
+    if (updateData.status && !['pending', 'processing', 'completed', 'failed'].includes(updateData.status)) {
+      return NextResponse.json({ error: "Invalid status value" }, { status: 400 });
+    }
+    
+    // Validate priority if provided
+    if (updateData.priority && !['low', 'medium', 'high'].includes(updateData.priority)) {
+      return NextResponse.json({ error: "Invalid priority value" }, { status: 400 });
+    }
+    
     const updatedJob = await prisma.job.update({
       where: { id: params.id },
-      data
+      data: updateData
     });
 
     return NextResponse.json(updatedJob);

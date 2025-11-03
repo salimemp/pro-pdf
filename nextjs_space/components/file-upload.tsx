@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
   DndContext,
@@ -224,9 +224,15 @@ export function FileUpload({
   }, [uploadedFiles, maxFiles]);
 
   // Update parent component whenever files change
+  // Using useRef to avoid infinite re-render loop
+  const onFilesSelectedRef = useRef(onFilesSelected);
   useEffect(() => {
-    onFilesSelected(uploadedFiles.map(uf => uf.file));
-  }, [uploadedFiles, onFilesSelected]);
+    onFilesSelectedRef.current = onFilesSelected;
+  }, [onFilesSelected]);
+
+  useEffect(() => {
+    onFilesSelectedRef.current(uploadedFiles.map(uf => uf.file));
+  }, [uploadedFiles]);
 
   const {
     getRootProps,
