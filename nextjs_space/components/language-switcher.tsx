@@ -23,6 +23,7 @@ export function LanguageSwitcher() {
         <Button 
           variant="ghost" 
           size="icon"
+          className="h-9 w-9 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 dark:text-slate-300 dark:hover:text-blue-400 dark:hover:bg-slate-800/50"
           aria-label="Switch language"
           aria-haspopup="true"
           aria-expanded="false"

@@ -94,9 +94,9 @@ export function Header() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setShowEncryptionManager(true)}
-                      className="relative"
+                      className="relative h-9 w-9 text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 dark:text-slate-300 dark:hover:text-blue-400 dark:hover:bg-slate-800/50"
                     >
-                      <Shield className={hasEncryptionKey ? "h-5 w-5 text-blue-400" : "h-5 w-5 text-slate-400"} />
+                      <Shield className={hasEncryptionKey ? "h-5 w-5 text-blue-400" : "h-5 w-5"} />
                       {hasEncryptionKey && (
                         <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
                       )}
@@ -165,10 +165,10 @@ export function Header() {
                 </DropdownMenu>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" className="text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 dark:text-slate-300 dark:hover:text-blue-400 dark:hover:bg-slate-800/50" asChild>
                     <Link href="/auth/login">{t('header.signin')}</Link>
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700" asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
                     <Link href="/auth/signup">{t('header.getstarted')}</Link>
                   </Button>
                 </div>
@@ -182,6 +182,7 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 dark:text-slate-300 dark:hover:text-blue-400 dark:hover:bg-slate-800/50"
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -230,10 +231,10 @@ export function Header() {
               )}
               {!session && (
                 <div className="flex flex-col space-y-2 px-3 pt-2">
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" className="text-slate-300 hover:text-blue-400 hover:bg-slate-800/50 dark:text-slate-300 dark:hover:text-blue-400 dark:hover:bg-slate-800/50" asChild>
                     <Link href="/auth/login">{t('header.signin')}</Link>
                   </Button>
-                  <Button className="bg-blue-600 hover:bg-blue-700" asChild>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
                     <Link href="/auth/signup">{t('header.getstarted')}</Link>
                   </Button>
                 </div>
