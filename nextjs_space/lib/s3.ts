@@ -33,7 +33,42 @@ function handleS3Error(error: any, operation: string): never {
   throw new Error(`Failed to ${operation}. Please try again later.`);
 }
 
-export async function uploadFile(buffer: Buffer, fileName: string): Promise<string> {
+// Helper function to determine content type from file extension
+function getContentType(fileName: string): string {
+  const ext = fileName.toLowerCase().split('.').pop();
+  
+  const contentTypes: Record<string, string> = {
+    // PDF
+    'pdf': 'application/pdf',
+    // Images
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    'svg': 'image/svg+xml',
+    // Documents
+    'doc': 'application/msword',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'xls': 'application/vnd.ms-excel',
+    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'ppt': 'application/vnd.ms-powerpoint',
+    'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'txt': 'text/plain',
+    'csv': 'text/csv',
+    // Archives
+    'zip': 'application/zip',
+    'rar': 'application/x-rar-compressed',
+    '7z': 'application/x-7z-compressed',
+    // Other
+    'json': 'application/json',
+    'xml': 'application/xml',
+  };
+  
+  return contentTypes[ext || ''] || 'application/octet-stream';
+}
+
+export async function uploadFile(buffer: Buffer, fileName: string, contentType?: string): Promise<string> {
   if (!buffer || buffer.length === 0) {
     throw new Error("Invalid file: buffer is empty");
   }
@@ -46,11 +81,14 @@ export async function uploadFile(buffer: Buffer, fileName: string): Promise<stri
     const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
     const key = `${folderPrefix}uploads/${Date.now()}-${sanitizedFileName}`;
     
+    // Use provided contentType or determine from file extension
+    const finalContentType = contentType || getContentType(fileName);
+    
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
       Body: buffer,
-      ContentType: 'application/pdf', // Default, will be set dynamically
+      ContentType: finalContentType,
     });
 
     await s3Client.send(command);
