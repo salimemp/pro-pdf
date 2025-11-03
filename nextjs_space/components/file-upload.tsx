@@ -161,6 +161,8 @@ export function FileUpload({
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [error, setError] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const isMountedRef = useRef(true);
+  const intervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -168,6 +170,17 @@ export function FileUpload({
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  // Cleanup all intervals on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      // Clear all running intervals
+      intervalsRef.current.forEach((interval) => clearInterval(interval));
+      intervalsRef.current.clear();
+    };
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
     setError('');
@@ -194,14 +207,22 @@ export function FileUpload({
 
       setUploadedFiles(prev => [...prev, ...newFiles]);
 
-      // Simulate upload progress with more realistic timing
+      // Simulate upload progress with proper cleanup
       newFiles.forEach((uploadedFile) => {
         let progress = 0;
         const interval = setInterval(() => {
+          // Check if component is still mounted
+          if (!isMountedRef.current) {
+            clearInterval(interval);
+            intervalsRef.current.delete(uploadedFile.id);
+            return;
+          }
+
           progress += Math.random() * 25 + 10; // More consistent progress
           if (progress >= 100) {
             progress = 100;
             clearInterval(interval);
+            intervalsRef.current.delete(uploadedFile.id);
             setUploadedFiles(prev => 
               prev.map(f => 
                 f.id === uploadedFile.id 
@@ -219,6 +240,9 @@ export function FileUpload({
             );
           }
         }, 300);
+        
+        // Store interval reference for cleanup
+        intervalsRef.current.set(uploadedFile.id, interval);
       });
     }
   }, [uploadedFiles, maxFiles]);
@@ -253,6 +277,12 @@ export function FileUpload({
   });
 
   const removeFile = (id: string) => {
+    // Clear the interval for this file if it exists
+    const interval = intervalsRef.current.get(id);
+    if (interval) {
+      clearInterval(interval);
+      intervalsRef.current.delete(id);
+    }
     setUploadedFiles(prev => prev.filter(f => f.id !== id));
   };
 

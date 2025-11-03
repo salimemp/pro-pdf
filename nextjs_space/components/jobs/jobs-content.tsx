@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Header } from "@/components/header";
 import { AdPlaceholder } from "@/components/ad-placeholder";
@@ -86,18 +86,16 @@ export function JobsContent() {
   const [sortBy, setSortBy] = useState<string>("createdAt");
   const [searchQuery, setSearchQuery] = useState("");
   const [completedJobIds, setCompletedJobIds] = useState<Set<string>>(new Set());
+  const isMountedRef = useRef(true);
 
-  useEffect(() => {
-    fetchJobs();
-    const interval = setInterval(fetchJobs, 3000); // Poll every 3 seconds
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const response = await fetch('/api/jobs');
       if (response.ok) {
         const data = await response.json();
+        
+        // Only update state if component is still mounted
+        if (!isMountedRef.current) return;
         
         // Check for newly completed jobs
         const newCompletedIds = new Set<string>();
@@ -120,9 +118,23 @@ export function JobsContent() {
     } catch (error) {
       console.error('Error fetching jobs:', error);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, [completedJobIds]);
+
+  // Set up polling with proper cleanup
+  useEffect(() => {
+    isMountedRef.current = true;
+    fetchJobs();
+    const interval = setInterval(fetchJobs, 3000); // Poll every 3 seconds
+    
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+    };
+  }, [fetchJobs]);
 
   const deleteJob = async (jobId: string) => {
     try {

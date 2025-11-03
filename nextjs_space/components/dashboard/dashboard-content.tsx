@@ -264,7 +264,7 @@ export function DashboardContent() {
                   compress: '/tools/compress',
                   'extract-text': '/tools/convert',
                   convert: '/tools/convert',
-                  sign: '/tools/convert'
+                  sign: '/tools/sign'
                 };
                 const route = toolRoutes[selectedTool] || '/tools/merge';
                 window.location.href = route;
