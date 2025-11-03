@@ -10,6 +10,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 import { OnboardingSlides } from "@/components/onboarding-slides";
 import { CookieConsent } from "@/components/cookie-consent";
+import { I18nProvider } from "@/lib/i18n/context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -55,11 +56,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            {children}
-            <Toaster />
-            <SonnerToaster position="top-right" richColors />
-            <OnboardingSlides />
-            <CookieConsent />
+            <I18nProvider>
+              {children}
+              <Toaster />
+              <SonnerToaster position="top-right" richColors />
+              <OnboardingSlides />
+              <CookieConsent />
+            </I18nProvider>
           </Providers>
         </ThemeProvider>
       </body>

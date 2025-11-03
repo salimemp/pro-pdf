@@ -16,56 +16,58 @@ import {
   Download,
   Upload
 } from "lucide-react";
-
-const features = [
-  {
-    icon: FileText,
-    title: "Merge PDFs",
-    description: "Combine multiple PDF files into one document with custom ordering and page selection."
-  },
-  {
-    icon: Scissors,
-    title: "Split PDFs", 
-    description: "Extract specific pages or split large PDFs into smaller, manageable documents."
-  },
-  {
-    icon: Archive,
-    title: "Compress PDFs",
-    description: "Reduce file size while maintaining quality with advanced compression algorithms."
-  },
-  {
-    icon: Type,
-    title: "PDF to Text",
-    description: "Extract text content from PDFs with OCR support for scanned documents."
-  },
-  {
-    icon: FileImage,
-    title: "Format Conversion",
-    description: "Convert PDFs to Word, Excel, PowerPoint, or images. Convert documents back to PDF."
-  },
-  {
-    icon: PenTool,
-    title: "E-Signatures",
-    description: "Add digital signatures to your PDFs with legal compliance and verification."
-  },
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description: "Bank-grade encryption, secure processing, and automatic file deletion for privacy."
-  },
-  {
-    icon: Cloud,
-    title: "Cloud Storage",
-    description: "Store and access your files from anywhere with secure cloud synchronization."
-  },
-  {
-    icon: Zap,
-    title: "Lightning Fast",
-    description: "Process files in seconds with our optimized servers and advanced algorithms."
-  }
-];
+import { useTranslation } from "@/lib/i18n/context";
 
 export function FeaturesSection() {
+  const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: FileText,
+      title: t('features.merge.title'),
+      description: t('features.merge.desc')
+    },
+    {
+      icon: Scissors,
+      title: t('features.split.title'), 
+      description: t('features.split.desc')
+    },
+    {
+      icon: Archive,
+      title: t('features.compress.title'),
+      description: t('features.compress.desc')
+    },
+    {
+      icon: Type,
+      title: t('features.text.title'),
+      description: t('features.text.desc')
+    },
+    {
+      icon: FileImage,
+      title: t('features.convert.title'),
+      description: t('features.convert.desc')
+    },
+    {
+      icon: PenTool,
+      title: t('features.sign.title'),
+      description: t('features.sign.desc')
+    },
+    {
+      icon: Shield,
+      title: t('features.security.title'),
+      description: t('features.security.desc')
+    },
+    {
+      icon: Cloud,
+      title: t('features.storage.title'),
+      description: t('features.storage.desc')
+    },
+    {
+      icon: Zap,
+      title: t('features.speed.title'),
+      description: t('features.speed.desc')
+    }
+  ];
   return (
     <section id="features" className="py-20 bg-slate-900/50">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -78,12 +80,11 @@ export function FeaturesSection() {
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
             <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Powerful PDF Tools
+              {t('features.title')}
             </span>
           </h2>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            Everything you need to work with PDFs professionally. From simple conversions to advanced editing, 
-            we've got you covered with enterprise-grade tools.
+            {t('features.subtitle')}
           </p>
         </motion.div>
 
@@ -130,28 +131,28 @@ export function FeaturesSection() {
               <Users className="w-5 h-5 text-blue-400 mr-2" />
               <span className="text-2xl font-bold text-white">100K+</span>
             </div>
-            <p className="text-sm text-slate-400">Active Users</p>
+            <p className="text-sm text-slate-400">{t('features.activeUsers')}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <FileText className="w-5 h-5 text-green-400 mr-2" />
               <span className="text-2xl font-bold text-white">10M+</span>
             </div>
-            <p className="text-sm text-slate-400">Files Processed</p>
+            <p className="text-sm text-slate-400">{t('hero.filesProcessed')}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <Zap className="w-5 h-5 text-yellow-400 mr-2" />
               <span className="text-2xl font-bold text-white">99.9%</span>
             </div>
-            <p className="text-sm text-slate-400">Uptime</p>
+            <p className="text-sm text-slate-400">{t('hero.uptime')}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <Shield className="w-5 h-5 text-red-400 mr-2" />
               <span className="text-2xl font-bold text-white">100%</span>
             </div>
-            <p className="text-sm text-slate-400">Secure</p>
+            <p className="text-sm text-slate-400">{t('hero.secure')}</p>
           </div>
         </motion.div>
       </div>

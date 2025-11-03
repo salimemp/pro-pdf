@@ -7,8 +7,10 @@ import { FileUpload } from "@/components/file-upload";
 import { ArrowRight, Shield, Zap, Cloud, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function HeroSection() {
+  const { t } = useTranslation();
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   return (
@@ -36,22 +38,21 @@ export function HeroSection() {
                   <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <span className="text-sm text-slate-400">Trusted by 100K+ users</span>
+              <span className="text-sm text-slate-400">{t('hero.trustedBy')}</span>
             </div>
 
             <div className="space-y-4">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                 <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-100 bg-clip-text text-transparent">
-                  Professional PDF
+                  {t('hero.title1')}
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                  Tools & Converter
+                  {t('hero.title2')}
                 </span>
               </h1>
               <p className="text-xl text-slate-300 leading-relaxed max-w-lg">
-                Convert, merge, split, compress, and edit PDFs with enterprise-grade security. 
-                No watermarks for premium users.
+                {t('hero.subtitle')}
               </p>
             </div>
 
@@ -64,7 +65,7 @@ export function HeroSection() {
                 className="flex items-center space-x-2 bg-slate-800/50 rounded-lg p-3"
               >
                 <Shield className="w-5 h-5 text-green-400" />
-                <span className="text-sm text-slate-300">Secure</span>
+                <span className="text-sm text-slate-300">{t('hero.secure')}</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -73,7 +74,7 @@ export function HeroSection() {
                 className="flex items-center space-x-2 bg-slate-800/50 rounded-lg p-3"
               >
                 <Zap className="w-5 h-5 text-yellow-400" />
-                <span className="text-sm text-slate-300">Fast</span>
+                <span className="text-sm text-slate-300">{t('hero.fast')}</span>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -82,7 +83,7 @@ export function HeroSection() {
                 className="flex items-center space-x-2 bg-slate-800/50 rounded-lg p-3"
               >
                 <Cloud className="w-5 h-5 text-blue-400" />
-                <span className="text-sm text-slate-300">Cloud</span>
+                <span className="text-sm text-slate-300">{t('hero.cloud')}</span>
               </motion.div>
             </div>
 
@@ -90,13 +91,13 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3" asChild>
                 <Link href="/auth/signup">
-                  Start Free Trial
+                  {t('hero.startFreeTrial')}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="border-slate-700 hover:bg-slate-800" asChild>
                 <Link href="#features">
-                  View Features
+                  {t('hero.viewFeatures')}
                 </Link>
               </Button>
             </div>
@@ -110,7 +111,7 @@ export function HeroSection() {
                 className="text-center"
               >
                 <div className="text-2xl font-bold text-white">10M+</div>
-                <div className="text-sm text-slate-400">Files Processed</div>
+                <div className="text-sm text-slate-400">{t('hero.filesProcessed')}</div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -119,7 +120,7 @@ export function HeroSection() {
                 className="text-center"
               >
                 <div className="text-2xl font-bold text-white">99.9%</div>
-                <div className="text-sm text-slate-400">Uptime</div>
+                <div className="text-sm text-slate-400">{t('hero.uptime')}</div>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -128,7 +129,7 @@ export function HeroSection() {
                 className="text-center"
               >
                 <div className="text-2xl font-bold text-white">100K+</div>
-                <div className="text-sm text-slate-400">Happy Users</div>
+                <div className="text-sm text-slate-400">{t('hero.happyUsers')}</div>
               </motion.div>
             </div>
           </motion.div>
@@ -144,10 +145,10 @@ export function HeroSection() {
               <div className="space-y-6">
                 <div className="text-center">
                   <h3 className="text-xl font-semibold text-white mb-2">
-                    Try It Now - No Signup Required
+                    {t('hero.tryNow')}
                   </h3>
                   <p className="text-slate-400 text-sm">
-                    Upload your PDF and start converting instantly
+                    {t('hero.uploadInfo')}
                   </p>
                 </div>
                 
@@ -164,11 +165,11 @@ export function HeroSection() {
                     className="space-y-2"
                   >
                     <p className="text-sm text-slate-300">
-                      {uploadedFiles.length} file(s) ready to process
+                      {uploadedFiles.length} {t('hero.filesReady')}
                     </p>
                     <Button className="w-full bg-green-600 hover:bg-green-700" asChild>
                       <Link href="/tools/merge">
-                        Continue to Tools
+                        {t('hero.continueToTools')}
                         <ArrowRight className="ml-2 w-4 h-4" />
                       </Link>
                     </Button>

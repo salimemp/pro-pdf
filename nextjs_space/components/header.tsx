@@ -18,9 +18,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { EncryptionManager } from "@/components/encryption-manager";
 import { retrieveKeyFromBrowser } from "@/lib/encryption";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function Header() {
   const { data: session, status } = useSession() || {};
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showEncryptionManager, setShowEncryptionManager] = useState(false);
   const [hasEncryptionKey, setHasEncryptionKey] = useState(false);
@@ -58,18 +61,18 @@ export function Header() {
           <div className="hidden md:flex items-center space-x-8">
             <nav className="flex items-center space-x-6">
               <Link href="/#features" className="text-slate-300 hover:text-blue-400 transition-colors">
-                Features
+                {t('header.features')}
               </Link>
               <Link href="/#pricing" className="text-slate-300 hover:text-blue-400 transition-colors">
-                Pricing
+                {t('header.pricing')}
               </Link>
               {session && (
                 <>
                   <Link href="/dashboard" className="text-slate-300 hover:text-blue-400 transition-colors">
-                    Dashboard
+                    {t('header.dashboard')}
                   </Link>
                   <Link href="/jobs" className="text-slate-300 hover:text-blue-400 transition-colors">
-                    Jobs
+                    {t('header.jobs')}
                   </Link>
                 </>
               )}
@@ -77,6 +80,9 @@ export function Header() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-2">
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+              
               {/* Theme Toggle */}
               <ThemeToggle />
 
@@ -97,7 +103,7 @@ export function Header() {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{hasEncryptionKey ? 'Encryption Active' : 'Enable Encryption'}</p>
+                    <p>{hasEncryptionKey ? t('header.encryptionActive') : t('header.enableEncryption')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -132,19 +138,19 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard" className="flex items-center">
                         <User className="mr-2 h-4 w-4" />
-                        Dashboard
+                        {t('header.dashboard')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/jobs" className="flex items-center">
                         <Clock className="mr-2 h-4 w-4" />
-                        Jobs Queue
+                        {t('header.jobsQueue')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
-                        Settings
+                        {t('header.settings')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -153,17 +159,17 @@ export function Header() {
                       onClick={() => signOut({ callbackUrl: '/' })}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
+                      {t('header.signout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
                 <div className="flex items-center space-x-3">
                   <Button variant="ghost" asChild>
-                    <Link href="/auth/login">Sign In</Link>
+                    <Link href="/auth/login">{t('header.signin')}</Link>
                   </Button>
                   <Button className="bg-blue-600 hover:bg-blue-700" asChild>
-                    <Link href="/auth/signup">Get Started</Link>
+                    <Link href="/auth/signup">{t('header.getstarted')}</Link>
                   </Button>
                 </div>
               )}
@@ -195,14 +201,14 @@ export function Header() {
                 className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Features
+                {t('header.features')}
               </Link>
               <Link
                 href="/#pricing"
                 className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Pricing
+                {t('header.pricing')}
               </Link>
               {session && (
                 <>
@@ -211,24 +217,24 @@ export function Header() {
                     className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Dashboard
+                    {t('header.dashboard')}
                   </Link>
                   <Link
                     href="/jobs"
                     className="block px-3 py-2 text-slate-300 hover:text-blue-400 transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Jobs
+                    {t('header.jobs')}
                   </Link>
                 </>
               )}
               {!session && (
                 <div className="flex flex-col space-y-2 px-3 pt-2">
                   <Button variant="ghost" asChild>
-                    <Link href="/auth/login">Sign In</Link>
+                    <Link href="/auth/login">{t('header.signin')}</Link>
                   </Button>
                   <Button className="bg-blue-600 hover:bg-blue-700" asChild>
-                    <Link href="/auth/signup">Get Started</Link>
+                    <Link href="/auth/signup">{t('header.getstarted')}</Link>
                   </Button>
                 </div>
               )}
