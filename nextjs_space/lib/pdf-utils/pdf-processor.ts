@@ -256,4 +256,138 @@ export class PDFProcessor {
       throw new Error(`Failed to add watermark: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  /**
+   * Compress PDF by optimizing and removing unnecessary data
+   */
+  static async compressPDF(
+    pdfFile: File,
+    options: CompressOptions
+  ): Promise<Uint8Array> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+
+      // Save with compression options
+      const compressedPdfBytes = await pdfDoc.save({
+        useObjectStreams: true,
+        addDefaultPage: false,
+        objectsPerTick: 50,
+      });
+
+      return compressedPdfBytes;
+    } catch (error) {
+      console.error('Error compressing PDF:', error);
+      throw new Error(`Failed to compress PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Encrypt PDF with password protection
+   * Note: Current pdf-lib version doesn't support password encryption.
+   * This is a placeholder for future implementation with a specialized encryption library.
+   */
+  static async encryptPDF(
+    pdfFile: File,
+    ownerPassword: string,
+    userPassword: string,
+    permissions?: {
+      printing?: boolean;
+      modifying?: boolean;
+      copying?: boolean;
+      annotating?: boolean;
+    }
+  ): Promise<Uint8Array> {
+    try {
+      // For now, just return the original PDF
+      // TODO: Implement proper encryption using pdf-lib-encrypt or similar library
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+
+      // Save PDF (without encryption for now)
+      const savedPdfBytes = await pdfDoc.save();
+
+      return savedPdfBytes;
+    } catch (error) {
+      console.error('Error processing PDF:', error);
+      throw new Error(`Failed to process PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Split PDF into page ranges
+   */
+  static async splitPDFByRanges(
+    pdfFile: File,
+    ranges: { start: number; end: number }[]
+  ): Promise<Uint8Array[]> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const splitPdfs: Uint8Array[] = [];
+
+      for (const range of ranges) {
+        const newPdf = await PDFDocument.create();
+        const pageIndices = [];
+        
+        for (let i = range.start - 1; i < range.end && i < pdfDoc.getPageCount(); i++) {
+          pageIndices.push(i);
+        }
+
+        const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+        copiedPages.forEach(page => newPdf.addPage(page));
+        
+        const pdfBytes = await newPdf.save();
+        splitPdfs.push(pdfBytes);
+      }
+
+      return splitPdfs;
+    } catch (error) {
+      console.error('Error splitting PDF by ranges:', error);
+      throw new Error(`Failed to split PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Convert images to PDF
+   */
+  static async imagesToPDF(imageFiles: File[]): Promise<Uint8Array> {
+    try {
+      const pdfDoc = await PDFDocument.create();
+
+      for (const imageFile of imageFiles) {
+        const imageBytes = await imageFile.arrayBuffer();
+        let image;
+
+        // Determine image type and embed
+        if (imageFile.type === 'image/png' || imageFile.name.toLowerCase().endsWith('.png')) {
+          image = await pdfDoc.embedPng(imageBytes);
+        } else if (
+          imageFile.type === 'image/jpeg' ||
+          imageFile.type === 'image/jpg' ||
+          imageFile.name.toLowerCase().endsWith('.jpg') ||
+          imageFile.name.toLowerCase().endsWith('.jpeg')
+        ) {
+          image = await pdfDoc.embedJpg(imageBytes);
+        } else {
+          throw new Error(`Unsupported image format: ${imageFile.type || imageFile.name}`);
+        }
+
+        // Create page with image dimensions
+        const page = pdfDoc.addPage([image.width, image.height]);
+        page.drawImage(image, {
+          x: 0,
+          y: 0,
+          width: image.width,
+          height: image.height,
+        });
+      }
+
+      const pdfBytes = await pdfDoc.save();
+      return pdfBytes;
+    } catch (error) {
+      console.error('Error converting images to PDF:', error);
+      throw new Error(`Failed to convert images to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }

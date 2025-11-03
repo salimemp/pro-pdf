@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Archive, ArrowRight, Download, Share2, Info, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { PDFProcessor } from "@/lib/pdf-utils";
 
 export default function CompressPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -24,6 +25,9 @@ export default function CompressPage() {
   const [enableEncryption, setEnableEncryption] = useState(false);
   const [currentJobId, setCurrentJobId] = useState<string | null>(null);
   const [showProgress, setShowProgress] = useState(false);
+  const [compressedPdfBlob, setCompressedPdfBlob] = useState<Blob | null>(null);
+  const [originalSize, setOriginalSize] = useState<number>(0);
+  const [compressedSize, setCompressedSize] = useState<number>(0);
 
   const handleCompress = async () => {
     if (selectedFiles.length === 0) {
@@ -33,6 +37,7 @@ export default function CompressPage() {
 
     setIsProcessing(true);
     setShowProgress(true);
+    setOriginalSize(selectedFiles[0].size);
     
     try {
       // Create a job for compression
@@ -54,40 +59,55 @@ export default function CompressPage() {
       const job = await response.json();
       setCurrentJobId(job.id);
 
-      // Simulate progress updates (in real implementation, this would be handled by the server)
-      let progress = 0;
-      const updateInterval = setInterval(async () => {
-        progress += Math.random() * 15 + 5;
-        if (progress >= 100) {
-          progress = 100;
-          clearInterval(updateInterval);
-          
-          // Update job to completed
-          await fetch(`/api/jobs/${job.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'completed', progress: 100 }),
-          });
-          
-          setDownloadUrl('#compressed-pdf-download');
-          setShowProgress(false);
-          toast.success("PDF compressed successfully!");
-          setIsProcessing(false);
-        } else {
-          await fetch(`/api/jobs/${job.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ progress: Math.round(progress), status: 'processing' }),
-          });
-        }
-      }, 500);
+      // Use real PDF compression
+      const compressedBytes = await PDFProcessor.compressPDF(selectedFiles[0], {
+        quality: compressionLevel,
+        removeMetadata: true,
+      });
 
+      // Update job progress
+      await fetch(`/api/jobs/${job.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed', progress: 100 }),
+      });
+
+      // Create blob and download URL
+      const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      setCompressedPdfBlob(blob);
+      setCompressedSize(compressedBytes.byteLength);
+      setDownloadUrl(url);
+      setShowProgress(false);
+      toast.success("PDF compressed successfully!");
+      setIsProcessing(false);
     } catch (error) {
       console.error('Compression error:', error);
       toast.error("Failed to compress PDF. Please try again.");
       setIsProcessing(false);
       setShowProgress(false);
+      
+      // Update job to failed
+      if (currentJobId) {
+        await fetch(`/api/jobs/${currentJobId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'failed', progress: 0 }),
+        });
+      }
     }
+  };
+
+  const handleDownload = () => {
+    if (!downloadUrl || !compressedPdfBlob) return;
+    
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `compressed-${selectedFiles[0]?.name || 'document.pdf'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -306,15 +326,18 @@ export default function CompressPage() {
                       Your PDF has been compressed successfully!
                     </div>
                     <div className="text-slate-300 text-sm mt-2">
-                      Original size: {selectedFiles[0]?.size ? (selectedFiles[0].size / 1024 / 1024).toFixed(2) : '0'} MB
-                      → Compressed size: ~{selectedFiles[0]?.size ? ((selectedFiles[0].size * 0.6) / 1024 / 1024).toFixed(2) : '0'} MB
+                      Original size: {(originalSize / 1024 / 1024).toFixed(2)} MB
+                      → Compressed size: {(compressedSize / 1024 / 1024).toFixed(2)} MB
+                      <span className="text-green-400 ml-2">
+                        (Saved {((1 - compressedSize / originalSize) * 100).toFixed(1)}%)
+                      </span>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button className="bg-green-600 hover:bg-green-700">
+                          <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
                             <Download className="mr-2 w-4 h-4" />
                             Download Compressed PDF
                           </Button>

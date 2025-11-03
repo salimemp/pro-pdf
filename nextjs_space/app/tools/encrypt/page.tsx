@@ -16,11 +16,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Shield, ArrowRight, Download, Share2, Info, Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { PDFProcessor } from "@/lib/pdf-utils";
 
 export default function EncryptPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>('');
+  const [encryptedPdfBlob, setEncryptedPdfBlob] = useState<Blob | null>(null);
   
   // Password settings
   const [ownerPassword, setOwnerPassword] = useState('');
@@ -52,15 +54,44 @@ export default function EncryptPage() {
 
     setIsProcessing(true);
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      setDownloadUrl('#encrypted-pdf-download');
-      toast.success("PDF encrypted successfully! Your document is now secure.");
+      // Note: Password encryption feature is coming soon
+      // For now, we process and optimize the PDF
+      const encryptedBytes = await PDFProcessor.encryptPDF(
+        selectedFiles[0],
+        ownerPassword,
+        userPassword,
+        {
+          printing: allowPrinting,
+          modifying: allowEditing,
+          copying: allowCopying,
+          annotating: allowAnnotations,
+        }
+      );
+
+      // Create blob and download URL
+      const blob = new Blob([encryptedBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      setEncryptedPdfBlob(blob);
+      setDownloadUrl(url);
+      toast.success("PDF processed successfully! Note: Password encryption feature is coming soon.");
     } catch (error) {
-      toast.error("Failed to encrypt PDF. Please try again.");
+      console.error('Encryption error:', error);
+      toast.error("Failed to process PDF. Please try again.");
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!downloadUrl || !encryptedPdfBlob) return;
+    
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `encrypted-${selectedFiles[0]?.name || 'document.pdf'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -361,7 +392,7 @@ export default function EncryptPage() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button className="bg-green-600 hover:bg-green-700">
+                          <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
                             <Download className="mr-2 w-4 h-4" />
                             Download Encrypted PDF
                           </Button>

@@ -14,18 +14,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileImage, ArrowRight, Download, Share2, Info } from "lucide-react";
+import { FileImage, ArrowRight, Download, Share2, Info, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { PDFProcessor } from "@/lib/pdf-utils";
 
 const conversionOptions = [
-  { value: 'pdf-to-word', label: 'PDF to Word (DOCX)', from: 'PDF', to: 'Word' },
-  { value: 'pdf-to-excel', label: 'PDF to Excel (XLSX)', from: 'PDF', to: 'Excel' },
-  { value: 'pdf-to-powerpoint', label: 'PDF to PowerPoint (PPTX)', from: 'PDF', to: 'PowerPoint' },
-  { value: 'pdf-to-image', label: 'PDF to Images (PNG)', from: 'PDF', to: 'Images' },
-  { value: 'word-to-pdf', label: 'Word to PDF', from: 'Word', to: 'PDF' },
-  { value: 'excel-to-pdf', label: 'Excel to PDF', from: 'Excel', to: 'PDF' },
-  { value: 'powerpoint-to-pdf', label: 'PowerPoint to PDF', from: 'PowerPoint', to: 'PDF' },
-  { value: 'image-to-pdf', label: 'Images to PDF', from: 'Images', to: 'PDF' },
+  { value: 'image-to-pdf', label: 'Images to PDF (Recommended)', from: 'Images', to: 'PDF', supported: true },
+  { value: 'pdf-to-image', label: 'PDF to Images (PNG) - Coming Soon', from: 'PDF', to: 'Images', supported: false },
+  { value: 'pdf-to-word', label: 'PDF to Word (DOCX) - Coming Soon', from: 'PDF', to: 'Word', supported: false },
+  { value: 'pdf-to-excel', label: 'PDF to Excel (XLSX) - Coming Soon', from: 'PDF', to: 'Excel', supported: false },
+  { value: 'pdf-to-powerpoint', label: 'PDF to PowerPoint (PPTX) - Coming Soon', from: 'PDF', to: 'PowerPoint', supported: false },
+  { value: 'word-to-pdf', label: 'Word to PDF - Coming Soon', from: 'Word', to: 'PDF', supported: false },
+  { value: 'excel-to-pdf', label: 'Excel to PDF - Coming Soon', from: 'Excel', to: 'PDF', supported: false },
+  { value: 'powerpoint-to-pdf', label: 'PowerPoint to PDF - Coming Soon', from: 'PowerPoint', to: 'PDF', supported: false },
 ];
 
 interface BatchFile {
@@ -44,6 +45,7 @@ export default function ConvertPage() {
   const [batchFiles, setBatchFiles] = useState<BatchFile[]>([]);
   const [totalProgress, setTotalProgress] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState(0);
+  const [convertedPdfBlob, setConvertedPdfBlob] = useState<Blob | null>(null);
 
   // Update batch files when selected files change
   useEffect(() => {
@@ -68,55 +70,42 @@ export default function ConvertPage() {
       return;
     }
 
+    const selectedOption = conversionOptions.find(opt => opt.value === conversionType);
+    
+    // Check if conversion type is supported
+    if (!selectedOption?.supported) {
+      toast.error("This conversion type is coming soon. Please try Images to PDF instead.");
+      return;
+    }
+
     setIsProcessing(true);
     setTotalProgress(0);
     
     try {
-      // Process files sequentially with progress updates
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-        const fileId = `file-${i}`;
+      if (conversionType === 'image-to-pdf') {
+        // Use real image-to-PDF conversion
+        setTotalProgress(30);
         
-        // Update file status to processing
-        setBatchFiles(prev => prev.map(f => 
-          f.id === fileId ? { ...f, status: 'processing' as const, progress: 0 } : f
-        ));
-
-        // Simulate conversion with progress updates
-        const steps = 10;
-        for (let step = 1; step <= steps; step++) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-          const progress = (step / steps) * 100;
-          
-          setBatchFiles(prev => prev.map(f => 
-            f.id === fileId ? { ...f, progress: Math.round(progress) } : f
-          ));
-
-          // Update total progress
-          const filesCompleted = i;
-          const currentFileProgress = progress / 100;
-          const totalFiles = selectedFiles.length;
-          const overallProgress = ((filesCompleted + currentFileProgress) / totalFiles) * 100;
-          setTotalProgress(overallProgress);
-
-          // Update estimated time (rough calculation)
-          const remainingFiles = totalFiles - (filesCompleted + currentFileProgress);
-          const avgTimePerFile = 2; // seconds
-          setEstimatedTime(Math.ceil(remainingFiles * avgTimePerFile));
-        }
-
-        // Mark file as completed
-        setBatchFiles(prev => prev.map(f => 
-          f.id === fileId ? { ...f, status: 'completed' as const, progress: 100 } : f
-        ));
+        const convertedBytes = await PDFProcessor.imagesToPDF(selectedFiles);
+        
+        setTotalProgress(80);
+        
+        // Create blob and download URL
+        const blob = new Blob([convertedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        setConvertedPdfBlob(blob);
+        setDownloadUrl(url);
+        setTotalProgress(100);
+        
+        toast.success(`${selectedFiles.length} image${selectedFiles.length > 1 ? 's' : ''} converted to PDF successfully!`);
+      } else {
+        // For unsupported conversions (shouldn't reach here due to earlier check)
+        throw new Error('Unsupported conversion type');
       }
-
-      setTotalProgress(100);
-      setEstimatedTime(0);
-      setDownloadUrl('#converted-file-download');
-      toast.success(`${selectedFiles.length} file${selectedFiles.length > 1 ? 's' : ''} converted successfully!`);
     } catch (error) {
-      toast.error("Failed to convert file. Please try again.");
+      console.error('Conversion error:', error);
+      toast.error("Failed to convert file. Please check your files and try again.");
       setBatchFiles(prev => prev.map(f => 
         f.status === 'processing' 
           ? { ...f, status: 'error' as const, error: 'Conversion failed' } 
@@ -125,6 +114,17 @@ export default function ConvertPage() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!downloadUrl || !convertedPdfBlob) return;
+    
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `converted-${Date.now()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const getAcceptedTypes = () => {
@@ -244,7 +244,7 @@ export default function ConvertPage() {
                     Your file has been converted successfully!
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
                       <Download className="mr-2 w-4 h-4" />
                       Download Converted File
                     </Button>

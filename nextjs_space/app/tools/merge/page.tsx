@@ -12,11 +12,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { FileText, ArrowRight, Download, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
+import { PDFProcessor } from "@/lib/pdf-utils";
 
 export default function MergePage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string>('');
+  const [mergedPdfBlob, setMergedPdfBlob] = useState<Blob | null>(null);
 
   const handleMerge = async () => {
     if (selectedFiles.length < 2) {
@@ -26,15 +28,35 @@ export default function MergePage() {
 
     setIsProcessing(true);
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setDownloadUrl('#merged-pdf-download');
+      // Use real PDF merging
+      const mergedBytes = await PDFProcessor.mergePDFs({
+        files: selectedFiles,
+      });
+
+      // Create blob and download URL
+      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      setMergedPdfBlob(blob);
+      setDownloadUrl(url);
       toast.success("PDFs merged successfully!");
     } catch (error) {
+      console.error('Merge error:', error);
       toast.error("Failed to merge PDFs. Please try again.");
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!downloadUrl || !mergedPdfBlob) return;
+    
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `merged-document-${Date.now()}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -123,7 +145,7 @@ export default function MergePage() {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button className="bg-green-600 hover:bg-green-700">
+                          <Button onClick={handleDownload} className="bg-green-600 hover:bg-green-700">
                             <Download className="mr-2 w-4 h-4" />
                             Download Merged PDF
                           </Button>

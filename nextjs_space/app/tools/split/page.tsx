@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Scissors, ArrowRight, Share2, Info } from "lucide-react";
 import { toast } from "sonner";
+import { PDFProcessor } from "@/lib/pdf-utils";
 
 export default function SplitPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -22,6 +23,20 @@ export default function SplitPage() {
   const [downloadFiles, setDownloadFiles] = useState<any[]>([]);
   const [splitMethod, setSplitMethod] = useState<'pages' | 'ranges'>('pages');
   const [pageNumbers, setPageNumbers] = useState('');
+
+  const parsePageInput = (input: string, method: 'pages' | 'ranges'): number[] | { start: number; end: number }[] => {
+    if (method === 'pages') {
+      // Parse comma-separated page numbers: "1,3,5" => [1,3,5]
+      return input.split(',').map(p => parseInt(p.trim())).filter(p => !isNaN(p));
+    } else {
+      // Parse ranges: "1-5,10-15" => [{start:1, end:5}, {start:10, end:15}]
+      const ranges = input.split(',').map(r => {
+        const [start, end] = r.trim().split('-').map(p => parseInt(p.trim()));
+        return { start: start || 1, end: end || start || 1 };
+      }).filter(r => !isNaN(r.start) && !isNaN(r.end));
+      return ranges;
+    }
+  };
 
   const handleSplit = async () => {
     if (selectedFiles.length === 0) {
@@ -36,20 +51,47 @@ export default function SplitPage() {
 
     setIsProcessing(true);
     try {
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const file = selectedFiles[0];
+      let splitPdfs: Uint8Array[];
+
+      if (splitMethod === 'pages') {
+        // Extract specific pages
+        const pages = parsePageInput(pageNumbers, 'pages') as number[];
+        if (pages.length === 0) {
+          throw new Error('Invalid page numbers');
+        }
+        splitPdfs = await Promise.all(
+          pages.map(async (pageNum) => {
+            return await PDFProcessor.extractPages(file, [pageNum]);
+          })
+        );
+      } else {
+        // Split by ranges
+        const ranges = parsePageInput(pageNumbers, 'ranges') as { start: number; end: number }[];
+        if (ranges.length === 0) {
+          throw new Error('Invalid page ranges');
+        }
+        splitPdfs = await PDFProcessor.splitPDFByRanges(file, ranges);
+      }
+
+      // Create download files
+      const files = splitPdfs.map((pdfBytes, index) => {
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        return {
+          id: `${index + 1}`,
+          name: `split-document-part-${index + 1}.pdf`,
+          url,
+          size: pdfBytes.byteLength,
+          blob,
+        };
+      });
       
-      // Generate mock download files
-      const mockFiles = [
-        { id: '1', name: 'split-document-part-1.pdf', url: '#split-pdf-1', size: 1024 * 1024 * 2.3 },
-        { id: '2', name: 'split-document-part-2.pdf', url: '#split-pdf-2', size: 1024 * 1024 * 1.8 },
-        { id: '3', name: 'split-document-part-3.pdf', url: '#split-pdf-3', size: 1024 * 1024 * 3.1 },
-      ];
-      
-      setDownloadFiles(mockFiles);
-      toast.success("PDF split successfully!");
+      setDownloadFiles(files);
+      toast.success(`PDF split into ${files.length} part${files.length > 1 ? 's' : ''} successfully!`);
     } catch (error) {
-      toast.error("Failed to split PDF. Please try again.");
+      console.error('Split error:', error);
+      toast.error("Failed to split PDF. Please check your page numbers and try again.");
     } finally {
       setIsProcessing(false);
     }
