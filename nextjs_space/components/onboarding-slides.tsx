@@ -13,8 +13,7 @@ import {
   Archive, 
   FileSignature,
   Cloud,
-  Shield,
-  X
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
@@ -101,30 +100,23 @@ export function OnboardingSlides() {
     handleComplete();
   };
 
-  // Prevent closing the dialog without saving the flag
+  // Prevent closing the dialog by clicking outside or pressing Escape
   const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      // If trying to close, mark as complete
-      handleComplete();
-    }
+    // Don't allow closing - user must use Skip or complete the tour
+    return;
   };
 
   const slide = slides[currentSlide];
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl bg-slate-900 border-slate-700 text-white p-0 overflow-hidden">
+      <DialogContent 
+        className="max-w-2xl bg-slate-900 border-slate-700 text-white p-0 overflow-hidden"
+        hideCloseButton
+      >
         <VisuallyHidden>
           <DialogTitle>{slide.title}</DialogTitle>
         </VisuallyHidden>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleSkip}
-          className="absolute top-4 right-4 z-50 text-slate-400 hover:text-white"
-        >
-          <X className="w-4 h-4" />
-        </Button>
 
         <div className="relative min-h-[500px] flex flex-col">
           {/* Slide Content */}
@@ -160,12 +152,25 @@ export function OnboardingSlides() {
                         ? "bg-purple-500 w-8"
                         : "bg-slate-600 hover:bg-slate-500"
                     )}
+                    aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
 
               {/* Navigation buttons */}
               <div className="flex space-x-3">
+                {/* Skip button - always visible */}
+                {currentSlide < slides.length - 1 && (
+                  <Button
+                    variant="ghost"
+                    onClick={handleSkip}
+                    className="text-slate-400 hover:text-white hover:bg-slate-800"
+                  >
+                    Skip
+                  </Button>
+                )}
+                
+                {/* Previous button - only show after first slide */}
                 {currentSlide > 0 && (
                   <Button
                     variant="outline"
@@ -177,6 +182,7 @@ export function OnboardingSlides() {
                   </Button>
                 )}
                 
+                {/* Next/Get Started button */}
                 <Button
                   onClick={handleNext}
                   className={cn(
