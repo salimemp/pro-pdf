@@ -14,6 +14,7 @@ interface BatchProgressFile {
   status: 'pending' | 'processing' | 'completed' | 'error';
   progress: number;
   error?: string;
+  size?: number; // in bytes
 }
 
 interface BatchProgressProps {
@@ -47,9 +48,30 @@ export function BatchProgress({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const formatFileSize = (bytes: number | undefined) => {
+    if (!bytes) return '';
+    const kb = bytes / 1024;
+    const mb = kb / 1024;
+    
+    if (mb >= 1) {
+      return `${mb.toFixed(2)} MB`;
+    } else if (kb >= 1) {
+      return `${kb.toFixed(2)} KB`;
+    } else {
+      return `${bytes} bytes`;
+    }
+  };
+
   const completedCount = files.filter(f => f.status === 'completed').length;
   const errorCount = files.filter(f => f.status === 'error').length;
   const processingCount = files.filter(f => f.status === 'processing').length;
+  
+  // Calculate throughput
+  const totalSize = files.reduce((sum, f) => sum + (f.size || 0), 0);
+  const processedSize = files
+    .filter(f => f.status === 'completed')
+    .reduce((sum, f) => sum + (f.size || 0), 0);
+  const throughput = elapsedTime > 0 ? processedSize / elapsedTime : 0;
 
   return (
     <Card className={cn("bg-slate-800/50 border-slate-700", className)}>
@@ -96,7 +118,7 @@ export function BatchProgress({
           <Progress value={totalProgress} className="h-3" />
           
           {/* Stats Row */}
-          <div className="flex items-center justify-between text-xs text-slate-400">
+          <div className="flex items-center justify-between text-xs text-slate-400 flex-wrap gap-2">
             <div className="flex items-center space-x-4">
               <span className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -115,7 +137,37 @@ export function BatchProgress({
                 </span>
               )}
             </div>
-            <span>Elapsed: {formatTime(elapsedTime)}</span>
+            <div className="flex items-center space-x-3">
+              {totalSize > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-slate-400">
+                        {formatFileSize(processedSize)} / {formatFileSize(totalSize)}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Data processed</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {throughput > 0 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-blue-400">
+                        {formatFileSize(throughput)}/s
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Processing speed</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              <span>Elapsed: {formatTime(elapsedTime)}</span>
+            </div>
           </div>
         </div>
 
@@ -182,25 +234,38 @@ export function BatchProgress({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <p className={cn(
-                            "text-sm font-medium truncate",
-                            file.status === 'completed' && "text-green-300",
-                            file.status === 'processing' && "text-blue-300",
-                            file.status === 'error' && "text-red-300",
-                            file.status === 'pending' && "text-slate-400"
-                          )}>
-                            {file.name}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <p className={cn(
+                              "text-sm font-medium truncate",
+                              file.status === 'completed' && "text-green-300",
+                              file.status === 'processing' && "text-blue-300",
+                              file.status === 'error' && "text-red-300",
+                              file.status === 'pending' && "text-slate-400"
+                            )}>
+                              {file.name}
+                            </p>
+                            {file.size && (
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                {formatFileSize(file.size)}
+                              </p>
+                            )}
+                          </div>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>{file.name}</p>
+                          {file.size && <p className="text-xs">{formatFileSize(file.size)}</p>}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
 
                     {file.status === 'processing' && (
-                      <span className="text-xs text-blue-400 font-medium ml-2">
+                      <span className="text-xs text-blue-400 font-medium ml-2 flex-shrink-0">
                         {file.progress}%
+                      </span>
+                    )}
+                    {file.status === 'completed' && file.size && (
+                      <span className="text-xs text-green-400 ml-2 flex-shrink-0">
+                        ✓ Done
                       </span>
                     )}
                   </div>

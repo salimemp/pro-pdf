@@ -22,6 +22,9 @@ const conversionOptions = [
   { value: 'image-to-pdf', label: 'Images to PDF (Recommended)', from: 'Images', to: 'PDF', supported: true },
   { value: 'pdf-to-image', label: 'PDF to Images (PNG)', from: 'PDF', to: 'Images', supported: true },
   { value: 'pdf-to-text', label: 'PDF to Text', from: 'PDF', to: 'Text', supported: true },
+  { value: 'text-to-pdf', label: 'Text to PDF', from: 'Text', to: 'PDF', supported: true },
+  { value: 'markdown-to-pdf', label: 'Markdown to PDF', from: 'Markdown', to: 'PDF', supported: true },
+  { value: 'csv-to-pdf', label: 'CSV to PDF', from: 'CSV', to: 'PDF', supported: true },
   { value: 'pdf-to-word', label: 'PDF to Word (DOCX) - Coming Soon', from: 'PDF', to: 'Word', supported: false },
   { value: 'pdf-to-excel', label: 'PDF to Excel (XLSX) - Coming Soon', from: 'PDF', to: 'Excel', supported: false },
   { value: 'pdf-to-powerpoint', label: 'PDF to PowerPoint (PPTX) - Coming Soon', from: 'PDF', to: 'PowerPoint', supported: false },
@@ -138,6 +141,54 @@ export default function ConvertPage() {
         setTotalProgress(100);
         
         toast.success(`Text extracted from PDF successfully!`);
+      } else if (conversionType === 'text-to-pdf') {
+        // Convert text to PDF
+        setTotalProgress(30);
+        
+        const convertedBytes = await PDFProcessor.textToPDF(selectedFiles[0]);
+        
+        setTotalProgress(80);
+        
+        const blob = new Blob([convertedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        setConvertedPdfBlob(blob);
+        setDownloadUrl(url);
+        setTotalProgress(100);
+        
+        toast.success(`Text file converted to PDF successfully!`);
+      } else if (conversionType === 'markdown-to-pdf') {
+        // Convert markdown to PDF
+        setTotalProgress(30);
+        
+        const convertedBytes = await PDFProcessor.markdownToPDF(selectedFiles[0]);
+        
+        setTotalProgress(80);
+        
+        const blob = new Blob([convertedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        setConvertedPdfBlob(blob);
+        setDownloadUrl(url);
+        setTotalProgress(100);
+        
+        toast.success(`Markdown file converted to PDF successfully!`);
+      } else if (conversionType === 'csv-to-pdf') {
+        // Convert CSV to PDF
+        setTotalProgress(30);
+        
+        const convertedBytes = await PDFProcessor.csvToPDF(selectedFiles[0]);
+        
+        setTotalProgress(80);
+        
+        const blob = new Blob([convertedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        setConvertedPdfBlob(blob);
+        setDownloadUrl(url);
+        setTotalProgress(100);
+        
+        toast.success(`CSV file converted to PDF successfully!`);
       } else {
         // For unsupported conversions (shouldn't reach here due to earlier check)
         throw new Error('Unsupported conversion type');
@@ -156,7 +207,9 @@ export default function ConvertPage() {
   };
 
   const handleDownload = () => {
-    if (conversionType === 'image-to-pdf' && downloadUrl && convertedPdfBlob) {
+    if ((conversionType === 'image-to-pdf' || conversionType === 'text-to-pdf' || 
+         conversionType === 'markdown-to-pdf' || conversionType === 'csv-to-pdf') && 
+        downloadUrl && convertedPdfBlob) {
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.download = `converted-${Date.now()}.pdf`;
@@ -214,6 +267,12 @@ export default function ConvertPage() {
       return ['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
     } else if (conversionType.startsWith('image-')) {
       return ['image/*'];
+    } else if (conversionType === 'text-to-pdf') {
+      return ['text/plain', '.txt'];
+    } else if (conversionType === 'markdown-to-pdf') {
+      return ['text/markdown', '.md'];
+    } else if (conversionType === 'csv-to-pdf') {
+      return ['text/csv', '.csv'];
     }
     return ['*/*'];
   };
@@ -271,7 +330,7 @@ export default function ConvertPage() {
                 <FileUpload
                   onFilesSelected={setSelectedFiles}
                   maxFiles={conversionType === 'image-to-pdf' ? 10 : 1}
-                  maxSize={50 * 1024 * 1024}
+                  maxSize={conversionType === 'csv-to-pdf' ? 100 * 1024 * 1024 : 50 * 1024 * 1024}
                   acceptedTypes={getAcceptedTypes()}
                 />
               </CardContent>
@@ -310,8 +369,10 @@ export default function ConvertPage() {
             />
           )}
 
-          {/* Results for Image-to-PDF and PDF-to-Text */}
-          {(downloadUrl && (conversionType === 'image-to-pdf' || conversionType === 'pdf-to-text')) && (
+          {/* Results for PDF generation and text extraction */}
+          {(downloadUrl && (conversionType === 'image-to-pdf' || conversionType === 'text-to-pdf' || 
+                            conversionType === 'markdown-to-pdf' || conversionType === 'csv-to-pdf' || 
+                            conversionType === 'pdf-to-text')) && (
             <Card className="bg-green-900/20 border-green-700">
               <CardContent className="p-6">
                 <div className="space-y-4">
@@ -339,7 +400,8 @@ export default function ConvertPage() {
                       <Download className="mr-2 w-4 h-4" />
                       Download {conversionType === 'pdf-to-text' ? 'Text File' : 'PDF'}
                     </Button>
-                    {conversionType === 'image-to-pdf' && (
+                    {(conversionType === 'image-to-pdf' || conversionType === 'text-to-pdf' || 
+                      conversionType === 'markdown-to-pdf' || conversionType === 'csv-to-pdf') && (
                       <ShareDialog
                         fileName={`converted-${selectedFiles[0]?.name || 'document'}`}
                         trigger={

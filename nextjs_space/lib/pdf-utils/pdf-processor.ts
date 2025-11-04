@@ -484,6 +484,310 @@ export class PDFProcessor {
   }
 
   /**
+   * Convert plain text to PDF
+   */
+  static async textToPDF(textFile: File): Promise<Uint8Array> {
+    try {
+      const text = await textFile.text();
+      const pdfDoc = await PDFDocument.create();
+      
+      const page = pdfDoc.addPage();
+      const { width, height } = page.getSize();
+      const fontSize = 12;
+      const lineHeight = fontSize * 1.2;
+      const margin = 50;
+      const maxWidth = width - 2 * margin;
+      
+      const lines = text.split('\n');
+      let yPosition = height - margin;
+      
+      for (const line of lines) {
+        // Simple word wrapping
+        const words = line.split(' ');
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine + (currentLine ? ' ' : '') + word;
+          const testWidth = testLine.length * (fontSize * 0.5); // Approximate width
+          
+          if (testWidth > maxWidth && currentLine) {
+            page.drawText(currentLine, {
+              x: margin,
+              y: yPosition,
+              size: fontSize,
+              color: rgb(0, 0, 0),
+            });
+            yPosition -= lineHeight;
+            currentLine = word;
+            
+            // Add new page if needed
+            if (yPosition < margin) {
+              const newPage = pdfDoc.addPage();
+              yPosition = newPage.getSize().height - margin;
+            }
+          } else {
+            currentLine = testLine;
+          }
+        }
+        
+        // Draw remaining text
+        if (currentLine) {
+          page.drawText(currentLine, {
+            x: margin,
+            y: yPosition,
+            size: fontSize,
+            color: rgb(0, 0, 0),
+          });
+          yPosition -= lineHeight;
+          
+          // Add new page if needed
+          if (yPosition < margin) {
+            const newPage = pdfDoc.addPage();
+            yPosition = newPage.getSize().height - margin;
+          }
+        }
+      }
+      
+      return await pdfDoc.save();
+    } catch (error) {
+      console.error('Error converting text to PDF:', error);
+      throw new Error(`Failed to convert text to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Convert Markdown to PDF with basic formatting
+   */
+  static async markdownToPDF(markdownFile: File): Promise<Uint8Array> {
+    try {
+      const markdown = await markdownFile.text();
+      const pdfDoc = await PDFDocument.create();
+      
+      let currentPage = pdfDoc.addPage();
+      let { width, height } = currentPage.getSize();
+      const margin = 50;
+      const maxWidth = width - 2 * margin;
+      let yPosition = height - margin;
+      
+      // Parse markdown lines
+      const lines = markdown.split('\n');
+      
+      for (const line of lines) {
+        let fontSize = 12;
+        let text = line;
+        let isBold = false;
+        
+        // Handle headers
+        if (line.startsWith('# ')) {
+          fontSize = 24;
+          text = line.substring(2);
+          isBold = true;
+        } else if (line.startsWith('## ')) {
+          fontSize = 20;
+          text = line.substring(3);
+          isBold = true;
+        } else if (line.startsWith('### ')) {
+          fontSize = 16;
+          text = line.substring(4);
+          isBold = true;
+        } else if (line.startsWith('#### ')) {
+          fontSize = 14;
+          text = line.substring(5);
+          isBold = true;
+        }
+        
+        // Remove bold/italic markers (simple implementation)
+        text = text.replace(/\*\*/g, '').replace(/\*/g, '').replace(/__/g, '').replace(/_/g, '');
+        
+        const lineHeight = fontSize * 1.2;
+        
+        // Check if we need a new page
+        if (yPosition < margin + lineHeight) {
+          currentPage = pdfDoc.addPage();
+          yPosition = currentPage.getSize().height - margin;
+        }
+        
+        // Draw text
+        if (text.trim()) {
+          // Simple word wrapping
+          const words = text.split(' ');
+          let currentLine = '';
+          
+          for (const word of words) {
+            const testLine = currentLine + (currentLine ? ' ' : '') + word;
+            const testWidth = testLine.length * (fontSize * 0.5);
+            
+            if (testWidth > maxWidth && currentLine) {
+              currentPage.drawText(currentLine, {
+                x: margin,
+                y: yPosition,
+                size: fontSize,
+                color: rgb(0, 0, 0),
+              });
+              yPosition -= lineHeight;
+              currentLine = word;
+              
+              if (yPosition < margin) {
+                currentPage = pdfDoc.addPage();
+                yPosition = currentPage.getSize().height - margin;
+              }
+            } else {
+              currentLine = testLine;
+            }
+          }
+          
+          if (currentLine) {
+            currentPage.drawText(currentLine, {
+              x: margin,
+              y: yPosition,
+              size: fontSize,
+              color: rgb(0, 0, 0),
+            });
+            yPosition -= lineHeight;
+          }
+        } else {
+          // Empty line
+          yPosition -= fontSize * 0.5;
+        }
+      }
+      
+      return await pdfDoc.save();
+    } catch (error) {
+      console.error('Error converting markdown to PDF:', error);
+      throw new Error(`Failed to convert markdown to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Convert CSV to PDF with table formatting
+   */
+  static async csvToPDF(csvFile: File): Promise<Uint8Array> {
+    try {
+      const csvText = await csvFile.text();
+      const pdfDoc = await PDFDocument.create();
+      
+      let currentPage = pdfDoc.addPage();
+      let { width, height } = currentPage.getSize();
+      const margin = 40;
+      const fontSize = 10;
+      const lineHeight = fontSize * 1.5;
+      let yPosition = height - margin;
+      
+      // Parse CSV
+      const rows = csvText.split('\n').map(row => {
+        // Simple CSV parser (handles basic cases)
+        const cells: string[] = [];
+        let currentCell = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < row.length; i++) {
+          const char = row[i];
+          
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            cells.push(currentCell.trim());
+            currentCell = '';
+          } else {
+            currentCell += char;
+          }
+        }
+        
+        cells.push(currentCell.trim());
+        return cells;
+      }).filter(row => row.some(cell => cell));
+      
+      if (rows.length === 0) {
+        throw new Error('CSV file is empty');
+      }
+      
+      // Calculate column widths
+      const numColumns = Math.max(...rows.map(row => row.length));
+      const columnWidth = (width - 2 * margin) / numColumns;
+      
+      // Draw table
+      for (let rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+        const row = rows[rowIndex];
+        
+        // Check if we need a new page
+        if (yPosition < margin + lineHeight) {
+          currentPage = pdfDoc.addPage();
+          yPosition = currentPage.getSize().height - margin;
+        }
+        
+        // Draw header with background (first row)
+        if (rowIndex === 0) {
+          currentPage.drawRectangle({
+            x: margin,
+            y: yPosition - lineHeight + 2,
+            width: width - 2 * margin,
+            height: lineHeight,
+            color: rgb(0.9, 0.9, 0.9),
+          });
+        }
+        
+        // Draw cells
+        for (let colIndex = 0; colIndex < row.length; colIndex++) {
+          const cell = row[colIndex];
+          const xPosition = margin + colIndex * columnWidth;
+          
+          // Truncate text if too long
+          let displayText = cell;
+          const maxChars = Math.floor(columnWidth / (fontSize * 0.5));
+          if (displayText.length > maxChars) {
+            displayText = displayText.substring(0, maxChars - 3) + '...';
+          }
+          
+          currentPage.drawText(displayText, {
+            x: xPosition + 5,
+            y: yPosition,
+            size: fontSize,
+            color: rgb(0, 0, 0),
+          });
+          
+          // Draw cell border
+          currentPage.drawLine({
+            start: { x: xPosition, y: yPosition - lineHeight + 2 },
+            end: { x: xPosition, y: yPosition + lineHeight - 2 },
+            thickness: 0.5,
+            color: rgb(0.7, 0.7, 0.7),
+          });
+        }
+        
+        // Draw horizontal line
+        currentPage.drawLine({
+          start: { x: margin, y: yPosition - lineHeight + 2 },
+          end: { x: width - margin, y: yPosition - lineHeight + 2 },
+          thickness: rowIndex === 0 ? 1 : 0.5,
+          color: rgb(0.7, 0.7, 0.7),
+        });
+        
+        yPosition -= lineHeight;
+      }
+      
+      // Draw final borders
+      currentPage.drawLine({
+        start: { x: margin, y: yPosition + lineHeight },
+        end: { x: width - margin, y: yPosition + lineHeight },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+      });
+      
+      currentPage.drawLine({
+        start: { x: width - margin, y: height - margin + lineHeight - 2 },
+        end: { x: width - margin, y: yPosition + lineHeight },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+      });
+      
+      return await pdfDoc.save();
+    } catch (error) {
+      console.error('Error converting CSV to PDF:', error);
+      throw new Error(`Failed to convert CSV to PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
    * Add page numbers to PDF
    */
   static async addPageNumbers(
