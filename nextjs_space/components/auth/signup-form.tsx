@@ -24,6 +24,8 @@ export function SignupForm() {
     password: "",
     confirmPassword: "",
     acceptTerms: false,
+    acceptDataProcessing: false,
+    acceptMarketing: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +39,13 @@ export function SignupForm() {
     }
 
     if (!formData.acceptTerms) {
-      toast.error("Please accept the terms and conditions");
+      toast.error("Please accept the Terms of Service and Privacy Policy");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!formData.acceptDataProcessing) {
+      toast.error("Please consent to data processing (required for account creation)");
       setIsLoading(false);
       return;
     }
@@ -54,6 +62,8 @@ export function SignupForm() {
           email: formData.email,
           password: formData.password,
           acceptTerms: formData.acceptTerms,
+          acceptDataProcessing: formData.acceptDataProcessing,
+          acceptMarketing: formData.acceptMarketing,
         }),
       });
 
@@ -217,26 +227,68 @@ export function SignupForm() {
           </div>
         </div>
 
-        {/* Terms and Conditions */}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="acceptTerms"
-            checked={formData.acceptTerms}
-            onCheckedChange={(checked) =>
-              setFormData({ ...formData, acceptTerms: checked as boolean })
-            }
-            className="border-slate-600"
-          />
-          <Label htmlFor="acceptTerms" className="text-sm text-slate-300">
-            I agree to the{" "}
-            <a href="/terms" className="text-blue-400 hover:text-blue-300">
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a href="/privacy" className="text-blue-400 hover:text-blue-300">
-              Privacy Policy
-            </a>
-          </Label>
+        {/* Consent and Permissions */}
+        <div className="space-y-3 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
+          <p className="text-sm font-medium text-slate-200">Permissions & Consent (GDPR Compliant)</p>
+          
+          {/* Terms and Conditions - Required */}
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="acceptTerms"
+              checked={formData.acceptTerms}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptTerms: checked as boolean })
+              }
+              className="border-slate-600 mt-1"
+            />
+            <Label htmlFor="acceptTerms" className="text-sm text-slate-300">
+              <span className="text-red-400">*</span> I agree to the{" "}
+              <a href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline">
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a href="/privacy" target="_blank" className="text-blue-400 hover:text-blue-300 underline">
+                Privacy Policy
+              </a>
+            </Label>
+          </div>
+
+          {/* Data Processing Consent - Required */}
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="acceptDataProcessing"
+              checked={formData.acceptDataProcessing}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptDataProcessing: checked as boolean })
+              }
+              className="border-slate-600 mt-1"
+            />
+            <Label htmlFor="acceptDataProcessing" className="text-sm text-slate-300">
+              <span className="text-red-400">*</span> I consent to the processing of my personal data as described in the Privacy Policy. 
+              This includes account management, file processing, and service provision. (Required)
+            </Label>
+          </div>
+
+          {/* Marketing Consent - Optional */}
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="acceptMarketing"
+              checked={formData.acceptMarketing}
+              onCheckedChange={(checked) =>
+                setFormData({ ...formData, acceptMarketing: checked as boolean })
+              }
+              className="border-slate-600 mt-1"
+            />
+            <Label htmlFor="acceptMarketing" className="text-sm text-slate-300">
+              I agree to receive promotional emails, product updates, and special offers. 
+              You can unsubscribe anytime. (Optional)
+            </Label>
+          </div>
+
+          <p className="text-xs text-slate-400 mt-2">
+            <span className="text-red-400">*</span> Required for account creation. 
+            You can review and modify your consent preferences in Account Settings at any time.
+          </p>
         </div>
 
         {/* Sign Up Button */}

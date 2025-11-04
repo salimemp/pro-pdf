@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Settings as SettingsIcon, User, Bell, Lock, CreditCard } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings as SettingsIcon, User, Bell, Lock, CreditCard, Shield } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { SecuritySettings } from "@/components/settings/security-settings";
+import { PrivacySettings } from "@/components/settings/privacy-settings";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession() || {};
@@ -55,8 +58,30 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          {/* Profile Settings */}
-          <Card className="bg-slate-800/50 border-slate-700">
+          {/* Settings Tabs */}
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-slate-700">
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline">Profile</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="flex items-center gap-2">
+                <Bell className="w-4 h-4" />
+                <span className="hidden sm:inline">Notifications</span>
+              </TabsTrigger>
+              <TabsTrigger value="security" className="flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                <span className="hidden sm:inline">Security</span>
+              </TabsTrigger>
+              <TabsTrigger value="privacy" className="flex items-center gap-2">
+                <Shield className="w-4 h-4" />
+                <span className="hidden sm:inline">Privacy</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-4">
+              <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -92,9 +117,11 @@ export default function SettingsPage() {
               </Button>
             </CardContent>
           </Card>
+            </TabsContent>
 
-          {/* Notifications */}
-          <Card className="bg-slate-800/50 border-slate-700">
+            {/* Notifications Tab */}
+            <TabsContent value="notifications" className="space-y-4">
+              <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Bell className="w-5 h-5" />
@@ -127,48 +154,18 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
+            </TabsContent>
 
-          {/* Security */}
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Lock className="w-5 h-5" />
-                Security
-              </CardTitle>
-              <CardDescription className="text-slate-400">
-                Manage your password and security settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="current-password" className="text-slate-200">Current Password</Label>
-                <Input
-                  id="current-password"
-                  type="password"
-                  className="bg-slate-900/50 border-slate-600 text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="new-password" className="text-slate-200">New Password</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  className="bg-slate-900/50 border-slate-600 text-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password" className="text-slate-200">Confirm New Password</Label>
-                <Input
-                  id="confirm-password"
-                  type="password"
-                  className="bg-slate-900/50 border-slate-600 text-white"
-                />
-              </div>
-              <Button variant="outline" className="border-slate-600 hover:bg-slate-700">
-                Change Password
-              </Button>
-            </CardContent>
-          </Card>
+            {/* Security Tab */}
+            <TabsContent value="security" className="space-y-4">
+              <SecuritySettings />
+            </TabsContent>
+
+            {/* Privacy Tab */}
+            <TabsContent value="privacy" className="space-y-4">
+              <PrivacySettings />
+            </TabsContent>
+          </Tabs>
 
           {/* Subscription (if premium) */}
           {(session.user as any)?.isPremium && (
