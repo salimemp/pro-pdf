@@ -14,7 +14,14 @@ import {
   Cloud,
   Users,
   Download,
-  Upload
+  Upload,
+  RotateCw,
+  Droplet,
+  Hash,
+  Layers,
+  Crop,
+  Edit,
+  Code
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/context";
 
@@ -36,6 +43,41 @@ export function FeaturesSection() {
       icon: Archive,
       title: t('features.compress.title'),
       description: t('features.compress.desc')
+    },
+    {
+      icon: RotateCw,
+      title: 'Rotate PDF',
+      description: 'Rotate your PDF pages 90°, 180°, or 270° with a single click'
+    },
+    {
+      icon: Droplet,
+      title: 'Add Watermark',
+      description: 'Add custom text watermarks to protect your documents'
+    },
+    {
+      icon: Hash,
+      title: 'Page Numbers',
+      description: 'Add customizable page numbers to your PDF'
+    },
+    {
+      icon: Layers,
+      title: 'Organize PDF',
+      description: 'Reorder or delete pages to organize your PDF'
+    },
+    {
+      icon: Crop,
+      title: 'Crop PDF',
+      description: 'Adjust page margins and crop your PDF'
+    },
+    {
+      icon: Edit,
+      title: 'Edit PDF',
+      description: 'Add text annotations to your PDF documents'
+    },
+    {
+      icon: Code,
+      title: 'HTML to PDF',
+      description: 'Convert HTML content or websites to PDF format'
     },
     {
       icon: Type,

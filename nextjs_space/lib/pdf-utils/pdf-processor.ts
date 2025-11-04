@@ -482,4 +482,182 @@ export class PDFProcessor {
       throw new Error(`Failed to extract text from PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
+
+  /**
+   * Add page numbers to PDF
+   */
+  static async addPageNumbers(
+    pdfFile: File,
+    options?: {
+      position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+      format?: 'number' | 'page-x-of-y';
+      fontSize?: number;
+      color?: { r: number; g: number; b: number };
+      startFrom?: number;
+    }
+  ): Promise<Uint8Array> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pages = pdfDoc.getPages();
+
+      const position = options?.position ?? 'bottom-center';
+      const format = options?.format ?? 'page-x-of-y';
+      const fontSize = options?.fontSize ?? 12;
+      const color = options?.color ?? { r: 0, g: 0, b: 0 };
+      const startFrom = options?.startFrom ?? 1;
+
+      pages.forEach((page, index) => {
+        const { width, height } = page.getSize();
+        const pageNumber = index + startFrom;
+        const totalPages = pages.length;
+        
+        let text = '';
+        if (format === 'number') {
+          text = pageNumber.toString();
+        } else {
+          text = `Page ${pageNumber} of ${totalPages}`;
+        }
+
+        // Calculate position
+        let x = 0;
+        let y = 0;
+        const margin = 30;
+
+        if (position.includes('left')) {
+          x = margin;
+        } else if (position.includes('center')) {
+          x = width / 2 - (text.length * fontSize) / 4;
+        } else if (position.includes('right')) {
+          x = width - margin - (text.length * fontSize) / 2;
+        }
+
+        if (position.includes('top')) {
+          y = height - margin;
+        } else if (position.includes('bottom')) {
+          y = margin;
+        }
+
+        page.drawText(text, {
+          x,
+          y,
+          size: fontSize,
+          color: rgb(color.r, color.g, color.b),
+        });
+      });
+
+      const numberedPdfBytes = await pdfDoc.save();
+      return numberedPdfBytes;
+    } catch (error) {
+      console.error('Error adding page numbers:', error);
+      throw new Error(`Failed to add page numbers: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Organize PDF pages (reorder or delete)
+   */
+  static async organizePDF(
+    pdfFile: File,
+    pageOrder: number[] // Array of page numbers in desired order (1-based)
+  ): Promise<Uint8Array> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const newPdf = await PDFDocument.create();
+
+      const pageIndices = pageOrder.map(num => num - 1);
+      const copiedPages = await newPdf.copyPages(pdfDoc, pageIndices);
+      copiedPages.forEach(page => newPdf.addPage(page));
+
+      const organizedPdfBytes = await newPdf.save();
+      return organizedPdfBytes;
+    } catch (error) {
+      console.error('Error organizing PDF:', error);
+      throw new Error(`Failed to organize PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Crop PDF pages
+   */
+  static async cropPDF(
+    pdfFile: File,
+    margins: {
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    }
+  ): Promise<Uint8Array> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pages = pdfDoc.getPages();
+
+      const top = margins.top ?? 0;
+      const bottom = margins.bottom ?? 0;
+      const left = margins.left ?? 0;
+      const right = margins.right ?? 0;
+
+      pages.forEach(page => {
+        const { width, height } = page.getSize();
+        page.setCropBox(
+          left,
+          bottom,
+          width - left - right,
+          height - top - bottom
+        );
+      });
+
+      const croppedPdfBytes = await pdfDoc.save();
+      return croppedPdfBytes;
+    } catch (error) {
+      console.error('Error cropping PDF:', error);
+      throw new Error(`Failed to crop PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  /**
+   * Add text annotation to PDF (basic edit)
+   */
+  static async addTextAnnotation(
+    pdfFile: File,
+    annotations: Array<{
+      text: string;
+      pageNumber: number;
+      x: number;
+      y: number;
+      fontSize?: number;
+      color?: { r: number; g: number; b: number };
+    }>
+  ): Promise<Uint8Array> {
+    try {
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const pages = pdfDoc.getPages();
+
+      annotations.forEach(annotation => {
+        const pageIndex = annotation.pageNumber - 1;
+        if (pageIndex >= 0 && pageIndex < pages.length) {
+          const page = pages[pageIndex];
+          const fontSize = annotation.fontSize ?? 12;
+          const color = annotation.color ?? { r: 0, g: 0, b: 0 };
+
+          page.drawText(annotation.text, {
+            x: annotation.x,
+            y: annotation.y,
+            size: fontSize,
+            color: rgb(color.r, color.g, color.b),
+          });
+        }
+      });
+
+      const annotatedPdfBytes = await pdfDoc.save();
+      return annotatedPdfBytes;
+    } catch (error) {
+      console.error('Error adding text annotation:', error);
+      throw new Error(`Failed to add text annotation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }

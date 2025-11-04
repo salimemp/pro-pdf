@@ -38,7 +38,7 @@ const plans = [
   {
     name: "Premium",
     icon: Crown,
-    price: "$9.99",
+    price: "$5.99",
     priceMonthly: "price_premium_monthly_placeholder",
     priceYearly: "price_premium_yearly_placeholder",
     period: "per month",
@@ -206,7 +206,7 @@ export default function PricingPage() {
                 <div className="text-center">
                   <div className="flex items-baseline justify-center space-x-1">
                     <span className="text-4xl font-bold text-white">
-                      {plan.name === 'Premium' && billingPeriod === 'yearly' ? '$7.99' : plan.price}
+                      {plan.name === 'Premium' && billingPeriod === 'yearly' ? '$4.79' : plan.price}
                     </span>
                     {plan.period && (
                       <span className="text-slate-400">
@@ -215,7 +215,7 @@ export default function PricingPage() {
                     )}
                   </div>
                   {plan.name === 'Premium' && billingPeriod === 'yearly' && (
-                    <p className="text-sm text-green-400 mt-1">Save $24/year</p>
+                    <p className="text-sm text-green-400 mt-1">Save $14.40/year</p>
                   )}
                 </div>
 
