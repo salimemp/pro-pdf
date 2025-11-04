@@ -17,7 +17,12 @@ export async function GET(req: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: {
+      select: {
+        id: true,
+        email: true,
+        isPremium: true,
+        twoFactorEnabled: true,
+        emailVerified: true,
         jobs: {
           select: {
             status: true,
@@ -66,7 +71,9 @@ export async function GET(req: NextRequest) {
       storageUsedGB: parseFloat(storageUsedGB.toFixed(2)),
       storagePercentage: parseFloat(storagePercentage.toFixed(1)),
       storageLimit,
-      timeSavedHours
+      timeSavedHours,
+      twoFactorEnabled: user.twoFactorEnabled || false,
+      emailVerified: user.emailVerified !== null,
     };
 
     return NextResponse.json(stats);

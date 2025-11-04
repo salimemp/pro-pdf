@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
+import { signupRateLimiter, getClientIdentifier } from "@/lib/rate-limit";
+import { generateToken, getTokenExpiry, sendVerificationEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +30,27 @@ function validateName(name: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  // Apply rate limiting
+  const clientId = getClientIdentifier(req);
+  const { allowed, remaining, resetTime } = signupRateLimiter.check(clientId);
+
+  if (!allowed) {
+    const retryAfter = Math.ceil((resetTime - Date.now()) / 1000);
+    return NextResponse.json(
+      {
+        error: 'Too many signup attempts',
+        message: 'Please try again later.',
+        retryAfter,
+      },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': retryAfter.toString(),
+        },
+      }
+    );
+  }
+
   try {
     const body = await req.json();
     const { email, password, firstName, lastName, acceptTerms } = body;
@@ -93,6 +116,10 @@ export async function POST(req: NextRequest) {
     // Hash password with strong cost factor
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Generate email verification token
+    const verificationToken = generateToken();
+    const verificationTokenExpiry = getTokenExpiry(24); // 24 hours
+
     // Create user with sanitized inputs
     const user = await prisma.user.create({
       data: {
@@ -101,12 +128,17 @@ export async function POST(req: NextRequest) {
         firstName: sanitizedFirstName,
         lastName: sanitizedLastName,
         name: `${sanitizedFirstName} ${sanitizedLastName}`,
+        verificationToken,
+        verificationTokenExpiry,
       },
     });
 
+    // Send verification email
+    await sendVerificationEmail(user.email, verificationToken);
+
     return NextResponse.json(
       {
-        message: "User created successfully",
+        message: "User created successfully. Please check your email to verify your account.",
         user: {
           id: user.id,
           email: user.email,

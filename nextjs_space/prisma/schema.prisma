@@ -37,7 +37,15 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  ipAddress    String?
+  userAgent    String?
+  deviceType   String?  // web, mobile, tablet
+  lastActivity DateTime @default(now())
+  createdAt    DateTime @default(now())
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([lastActivity])
 }
 
 model User {
@@ -54,6 +62,20 @@ model User {
   subscriptionId   String?   @unique
   subscriptionStatus String? // active, inactive, canceled, past_due
   subscriptionEndDate DateTime?
+  
+  // 2FA Fields
+  twoFactorEnabled Boolean   @default(false)
+  twoFactorSecret  String?   // Encrypted TOTP secret
+  backupCodes      Json?     // Array of encrypted backup codes
+  
+  // Email Verification
+  verificationToken String?  @unique
+  verificationTokenExpiry DateTime?
+  
+  // Password Reset
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -63,6 +85,10 @@ model User {
   conversionHistory ConversionHistory[]
   subscriptions    Subscription[]
   jobs             Job[]
+  
+  @@index([email])
+  @@index([verificationToken])
+  @@index([resetToken])
 }
 
 model VerificationToken {
