@@ -52,3 +52,23 @@ export async function sendPasswordResetEmail(
   //   html: `Click <a href="${resetUrl}">here</a> to reset your password.`
   // });
 }
+
+// Generic email sending function for security notifications
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string
+): Promise<void> {
+  console.log('\n📧 Email Notification');
+  console.log('To:', to);
+  console.log('Subject:', subject);
+  console.log('Content:', html.substring(0, 200) + '...');
+  console.log('\n');
+
+  // In production, send actual email using your preferred service:
+  // await emailService.send({
+  //   to,
+  //   subject,
+  //   html
+  // });
+}

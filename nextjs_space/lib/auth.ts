@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { logSecurityEvent, getLocationFromIP, getDeviceType } from "./security-logger";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),

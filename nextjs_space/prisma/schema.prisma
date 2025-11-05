@@ -89,6 +89,7 @@ model User {
   conversionHistory ConversionHistory[]
   subscriptions    Subscription[]
   jobs             Job[]
+  securityLogs     SecurityLog[]
   
   @@index([email])
   @@index([verificationToken])
@@ -185,4 +186,24 @@ model Job {
   @@index([userId, status])
   @@index([userId, createdAt])
   @@index([nextRunAt])
+}
+
+model SecurityLog {
+  id            String   @id @default(cuid())
+  userId        String
+  eventType     String   // login, password_change, 2fa_enabled, 2fa_disabled, suspicious_login, session_revoked
+  description   String
+  ipAddress     String?
+  userAgent     String?
+  location      String?  // Country/City from IP geolocation
+  deviceType    String?  // web, mobile, tablet
+  success       Boolean  @default(true)
+  metadata      Json?    // Additional context (e.g., failed login reason, changed settings)
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@index([userId, eventType])
+  @@index([createdAt])
 }

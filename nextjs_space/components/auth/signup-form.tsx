@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { PasswordStrengthIndicator, validatePasswordStrength } from "@/components/password-strength-indicator";
+import { PasswordGenerator } from "@/components/password-generator";
 
 export function SignupForm() {
   const router = useRouter();
@@ -31,6 +33,14 @@ export function SignupForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // Validate password strength
+    const passwordValidation = validatePasswordStrength(formData.password);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.message);
+      setIsLoading(false);
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match");
@@ -178,9 +188,16 @@ export function SignupForm() {
         {/* Password Fields */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-slate-200">
-              Password
-            </Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password" className="text-slate-200">
+                Password
+              </Label>
+              <PasswordGenerator
+                onPasswordGenerated={(pwd) => {
+                  setFormData({ ...formData, password: pwd, confirmPassword: pwd });
+                }}
+              />
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
               <Input
@@ -205,6 +222,9 @@ export function SignupForm() {
                 )}
               </button>
             </div>
+            {formData.password && (
+              <PasswordStrengthIndicator password={formData.password} />
+            )}
           </div>
 
           <div className="space-y-2">

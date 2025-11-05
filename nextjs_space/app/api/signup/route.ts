@@ -4,14 +4,23 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { signupRateLimiter, getClientIdentifier } from "@/lib/rate-limit";
 import { generateToken, getTokenExpiry, sendVerificationEmail } from "@/lib/email";
+import { logSecurityEvent, getClientIP, getUserAgent, getDeviceType, getLocationFromIP } from "@/lib/security-logger";
 
 export const dynamic = "force-dynamic";
 
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Password validation: min 8 chars, at least 1 letter and 1 number
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+// Strong password validation: min 8 chars, uppercase, lowercase, number, and special character
+function validatePasswordStrength(password: string): boolean {
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password) &&
+    /[@$!%*#?&]/.test(password)
+  );
+}
 
 function sanitizeInput(input: string): string {
   return input.trim().replace(/[<>]/g, '');
@@ -22,7 +31,7 @@ function validateEmail(email: string): boolean {
 }
 
 function validatePassword(password: string): boolean {
-  return PASSWORD_REGEX.test(password) && password.length >= 8 && password.length <= 128;
+  return validatePasswordStrength(password) && password.length >= 8 && password.length <= 128;
 }
 
 function validateName(name: string): boolean {
@@ -74,7 +83,7 @@ export async function POST(req: NextRequest) {
     // Validate password strength
     if (!validatePassword(password)) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters long and contain at least one letter and one number" },
+        { error: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*#?&)" },
         { status: 400 }
       );
     }
@@ -135,6 +144,27 @@ export async function POST(req: NextRequest) {
 
     // Send verification email
     await sendVerificationEmail(user.email, verificationToken);
+
+    // Log signup event
+    try {
+      const ipAddress = getClientIP(req);
+      const userAgent = getUserAgent(req);
+      const deviceType = getDeviceType(userAgent);
+      const location = await getLocationFromIP(ipAddress);
+
+      await logSecurityEvent({
+        userId: user.id,
+        eventType: 'signup',
+        description: `New account created from ${location}`,
+        ipAddress,
+        userAgent,
+        location,
+        deviceType,
+        success: true,
+      });
+    } catch (logError) {
+      console.error('Failed to log signup event:', logError);
+    }
 
     return NextResponse.json(
       {

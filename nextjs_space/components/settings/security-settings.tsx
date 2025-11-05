@@ -17,8 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Shield, Smartphone, Key, Monitor, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import { Shield, Smartphone, Key, Monitor, AlertCircle, CheckCircle2, X, Activity, MapPin, Clock, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { PasswordStrengthIndicator, validatePasswordStrength } from '@/components/password-strength-indicator';
+import { PasswordGenerator } from '@/components/password-generator';
 
 interface Session {
   id: string;
@@ -30,9 +32,21 @@ interface Session {
   expires: string;
 }
 
+interface SecurityLog {
+  id: string;
+  eventType: string;
+  description: string;
+  ipAddress?: string;
+  location?: string;
+  deviceType?: string;
+  success: boolean;
+  createdAt: string;
+}
+
 export function SecuritySettings() {
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [securityLogs, setSecurityLogs] = useState<SecurityLog[]>([]);
   const [loading, setLoading] = useState(false);
   
   // 2FA setup state
@@ -47,9 +61,20 @@ export function SecuritySettings() {
   const [showDisable2FA, setShowDisable2FA] = useState(false);
   const [disablePassword, setDisablePassword] = useState('');
 
+  // Password change state
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+
   useEffect(() => {
     loadSecuritySettings();
     loadSessions();
+    loadSecurityLogs();
   }, []);
 
   const loadSecuritySettings = async () => {
@@ -73,6 +98,18 @@ export function SecuritySettings() {
       }
     } catch (error) {
       console.error('Failed to load sessions:', error);
+    }
+  };
+
+  const loadSecurityLogs = async () => {
+    try {
+      const res = await fetch('/api/security/logs?limit=20');
+      if (res.ok) {
+        const data = await res.json();
+        setSecurityLogs(data.logs || []);
+      }
+    } catch (error) {
+      console.error('Failed to load security logs:', error);
     }
   };
 
@@ -206,19 +243,192 @@ export function SecuritySettings() {
     }
   };
 
+  const handleChangePassword = async () => {
+    const { currentPassword, newPassword, confirmPassword } = passwordData;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error('All fields are required');
+      return;
+    }
+
+    // Validate new password strength
+    const passwordValidation = validatePasswordStrength(newPassword);
+    if (!passwordValidation.valid) {
+      toast.error(passwordValidation.message);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/user/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      
+      if (res.ok) {
+        toast.success('Password changed successfully! A confirmation email has been sent.');
+        setShowChangePassword(false);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        loadSecurityLogs(); // Reload logs to show password change event
+      } else {
+        const error = await res.json();
+        toast.error(error.error || 'Failed to change password');
+      }
+    } catch (error) {
+      toast.error('Failed to change password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getDeviceInfo = (session: Session) => {
     const ua = session.userAgent || '';
     if (ua.includes('Mobile')) return { icon: Smartphone, type: 'Mobile' };
     return { icon: Monitor, type: 'Desktop' };
   };
 
+  const getEventIcon = (eventType: string) => {
+    switch (eventType) {
+      case 'login':
+      case 'signup':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'failed_login':
+        return <X className="h-4 w-4 text-red-500" />;
+      case 'suspicious_login':
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case 'password_change':
+        return <Key className="h-4 w-4 text-blue-500" />;
+      case '2fa_enabled':
+      case '2fa_disabled':
+        return <Shield className="h-4 w-4 text-purple-500" />;
+      case 'session_revoked':
+        return <X className="h-4 w-4 text-orange-500" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getEventBadgeColor = (eventType: string) => {
+    switch (eventType) {
+      case 'login':
+      case 'signup':
+        return 'bg-green-500/10 text-green-500';
+      case 'failed_login':
+        return 'bg-red-500/10 text-red-500';
+      case 'suspicious_login':
+        return 'bg-yellow-500/10 text-yellow-500';
+      case 'password_change':
+        return 'bg-blue-500/10 text-blue-500';
+      case '2fa_enabled':
+      case '2fa_disabled':
+        return 'bg-purple-500/10 text-purple-500';
+      default:
+        return 'bg-gray-500/10 text-gray-500';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="2fa" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="2fa">Two-Factor Authentication</TabsTrigger>
-          <TabsTrigger value="sessions">Active Sessions</TabsTrigger>
+      <Tabs defaultValue="password" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="password">Password</TabsTrigger>
+          <TabsTrigger value="activity">Activity Log</TabsTrigger>
+          <TabsTrigger value="2fa">2FA</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
         </TabsList>
+
+        {/* Password Tab */}
+        <TabsContent value="password" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5" />
+                Change Password
+              </CardTitle>
+              <CardDescription>
+                Update your password to keep your account secure
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button onClick={() => setShowChangePassword(true)}>
+                Change Password
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Activity Log Tab */}
+        <TabsContent value="activity" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Security Activity Log
+              </CardTitle>
+              <CardDescription>
+                Recent security events and account activity
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {securityLogs.length > 0 ? (
+                  securityLogs.map((log) => (
+                    <div
+                      key={log.id}
+                      className="flex items-start gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="mt-1">{getEventIcon(log.eventType)}</div>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className={getEventBadgeColor(log.eventType)}>
+                            {log.eventType.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                          {!log.success && (
+                            <Badge variant="destructive" className="text-xs">
+                              FAILED
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm">{log.description}</p>
+                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                          {log.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {log.location}
+                            </span>
+                          )}
+                          {log.ipAddress && (
+                            <span className="flex items-center gap-1">
+                              <Monitor className="h-3 w-3" />
+                              {log.ipAddress}
+                            </span>
+                          )}
+                          {log.deviceType && (
+                            <span className="capitalize">{log.deviceType}</span>
+                          )}
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(log.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-8">
+                    No activity logs found
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="2fa" className="space-y-4">
           <Card>
@@ -437,6 +647,107 @@ export function SecuritySettings() {
             </Button>
             <Button onClick={handleDisable2FA} disabled={loading}>
               Disable 2FA
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={showChangePassword} onOpenChange={setShowChangePassword}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new strong password
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Current Password</Label>
+              <div className="relative">
+                <Input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={passwordData.currentPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, currentPassword: e.target.value })
+                  }
+                  placeholder="Enter current password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showCurrentPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <Label>New Password</Label>
+                <PasswordGenerator
+                  onPasswordGenerated={(pwd) => {
+                    setPasswordData({ ...passwordData, newPassword: pwd, confirmPassword: pwd });
+                  }}
+                  buttonVariant="ghost"
+                  buttonSize="sm"
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  type={showNewPassword ? 'text' : 'password'}
+                  value={passwordData.newPassword}
+                  onChange={(e) =>
+                    setPasswordData({ ...passwordData, newPassword: e.target.value })
+                  }
+                  placeholder="Enter new password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              {passwordData.newPassword && (
+                <PasswordStrengthIndicator password={passwordData.newPassword} />
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Confirm New Password</Label>
+              <Input
+                type={showNewPassword ? 'text' : 'password'}
+                value={passwordData.confirmPassword}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, confirmPassword: e.target.value })
+                }
+                placeholder="Confirm new password"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowChangePassword(false);
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleChangePassword} disabled={loading}>
+              {loading ? 'Changing...' : 'Change Password'}
             </Button>
           </DialogFooter>
         </DialogContent>
