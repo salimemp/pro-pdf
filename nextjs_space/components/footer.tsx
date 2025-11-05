@@ -3,8 +3,11 @@
 
 import Link from "next/link";
 import { FileText, Mail, MapPin, Phone } from "lucide-react";
+import { useTranslation } from "@/lib/i18n/context";
 
 export function Footer() {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-slate-950 border-t border-slate-800">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
@@ -21,32 +24,32 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-slate-400 text-sm max-w-xs">
-              Professional PDF tools for modern professionals. Convert, edit, and manage PDFs with enterprise-grade security.
+              {t('footer.brand.description')}
             </p>
           </div>
 
           {/* Product Links */}
           <div className="space-y-4">
-            <h4 className="text-white font-semibold">Tools</h4>
+            <h4 className="text-white font-semibold">{t('footer.tools')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/tools/merge" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Merge PDFs
+                  {t('footer.tools.merge')}
                 </Link>
               </li>
               <li>
                 <Link href="/tools/split" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Split PDFs
+                  {t('footer.tools.split')}
                 </Link>
               </li>
               <li>
                 <Link href="/tools/compress" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Compress PDFs
+                  {t('footer.tools.compress')}
                 </Link>
               </li>
               <li>
                 <Link href="/tools/convert" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Convert PDFs
+                  {t('footer.tools.convert')}
                 </Link>
               </li>
             </ul>
@@ -54,21 +57,21 @@ export function Footer() {
 
           {/* Company Links */}
           <div className="space-y-4">
-            <h4 className="text-white font-semibold">Company</h4>
+            <h4 className="text-white font-semibold">{t('footer.company')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/about" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  About
+                  {t('footer.company.about')}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Contact
+                  {t('footer.company.contact')}
                 </Link>
               </li>
               <li>
                 <Link href="/help" className="text-slate-400 hover:text-blue-400 transition-colors">
-                  Help Center
+                  {t('help.title')}
                 </Link>
               </li>
             </ul>
@@ -76,7 +79,7 @@ export function Footer() {
 
           {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="text-white font-semibold">Get in Touch</h4>
+            <h4 className="text-white font-semibold">{t('contact.info')}</h4>
             <div className="space-y-3 text-sm">
               <div className="flex items-center space-x-2">
                 <Mail className="w-4 h-4 text-slate-400" />
@@ -98,14 +101,14 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-800">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-slate-400">
-              © 2024 PRO PDF. All rights reserved.
+              © {new Date().getFullYear()} PRO PDF. {t('footer.copyright')}
             </div>
             <div className="flex items-center space-x-6 text-sm">
               <Link href="/privacy" className="text-slate-400 hover:text-blue-400 transition-colors">
-                Privacy Policy
+                {t('footer.legal.privacy')}
               </Link>
               <Link href="/terms" className="text-slate-400 hover:text-blue-400 transition-colors">
-                Terms of Service
+                {t('footer.legal.terms')}
               </Link>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full" />

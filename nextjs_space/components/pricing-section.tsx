@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Crown, Zap } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/context";
 
 const plans = [
   {
@@ -57,6 +58,7 @@ const plans = [
 ];
 
 export function PricingSection() {
+  const { t } = useTranslation();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
   return (
@@ -71,11 +73,11 @@ export function PricingSection() {
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
             <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              Simple, Transparent Pricing
+              {t('pricing.title')}
             </span>
           </h2>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            Choose the perfect plan for your needs. Start free, upgrade when you're ready for more power.
+            {t('pricing.subtitle')}
           </p>
         </motion.div>
 
