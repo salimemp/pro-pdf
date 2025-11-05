@@ -8,13 +8,20 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 ## 🌟 Features
 
 ### Core PDF Tools
-- **Convert PDF**: Transform PDFs to images or extract text content
+- **Convert PDF**: Transform PDFs to images, text, Word, Excel, PowerPoint, CSV, or Markdown
+- **HTML to PDF**: Convert web pages and HTML content to PDF documents
 - **Merge PDF**: Combine multiple PDF files into a single document
 - **Split PDF**: Separate PDFs into individual pages or custom ranges
 - **Compress PDF**: Reduce file size while maintaining quality
 - **Protect PDF**: Add password encryption to secure your documents
 - **Sign PDF**: Add digital signatures with drawing or text
 - **Decrypt PDF**: Remove password protection from encrypted PDFs
+- **Rotate PDF**: Rotate pages clockwise or counterclockwise
+- **Watermark PDF**: Add text or image watermarks to your documents
+- **Page Numbers**: Add customizable page numbers to PDFs
+- **Organize PDF**: Reorder, remove, or rearrange PDF pages
+- **Crop PDF**: Trim and adjust PDF page margins
+- **Edit PDF**: Modify text and content in PDF documents
 
 ### User Experience
 - 🌓 **Dark/Light Theme**: Toggle between light and dark modes
@@ -25,11 +32,16 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 
 ### Security & Privacy
 - 🔐 **End-to-End Encryption**: Client-side processing for maximum privacy
-- 🔑 **Two-Factor Authentication (2FA)**: Enhanced account security
-- 📧 **Email Verification**: Secure account activation
-- 🔒 **Session Management**: Advanced security features
-- 🛡️ **Rate Limiting**: Protection against abuse
+- 🔑 **Two-Factor Authentication (2FA)**: Enhanced account security with QR code setup
+- 📧 **Email Verification**: Secure account activation and password reset
+- 🔒 **Session Management**: Advanced security features with activity monitoring
+- 🛡️ **Rate Limiting**: Protection against abuse and DDoS attacks
 - 📊 **GDPR/HIPAA/PIPEDA Compliant**: Data protection standards
+- 🔐 **Strong Password Validation**: Real-time password strength checking with visual feedback
+- 🎲 **Password Generator**: Generate cryptographically secure passwords
+- 📋 **Security Activity Log**: Monitor all security-related events on your account
+- ⚠️ **Email Alerts**: Receive notifications for suspicious activity, account lockouts, and security events
+- 🛡️ **Security Dashboard**: Comprehensive view of account security and recent activity
 
 ### Authentication & User Management
 - User registration and login
@@ -40,12 +52,16 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 - Account settings and preferences
 
 ### Additional Features
-- ☁️ **Cloud Storage**: Secure file storage integration
-- 💳 **Subscription Plans**: Free and Pro tiers with Stripe integration
-- 📊 **Dashboard**: Track your usage and manage files
-- 🔄 **Scheduled Jobs**: Automate repetitive tasks
-- 📜 **Comprehensive Logging**: Activity tracking
+- ☁️ **Cloud Storage**: Secure file storage integration with AWS S3
+- 💳 **Subscription Plans**: Free and Premium tiers ($5.99/month) with Stripe integration
+- 📊 **Dashboard**: Track your usage, manage files, and view security activity
+- 🔄 **Scheduled Jobs**: Automate repetitive PDF processing tasks
+- 📜 **Comprehensive Logging**: Activity tracking and security event monitoring
 - 🍪 **Cookie Consent**: GDPR-compliant cookie management
+- 📱 **Mobile Responsive**: Fully optimized for mobile devices and tablets
+- ⚡ **Batch Processing**: Process multiple files simultaneously with progress tracking
+- 🎨 **Modern UI/UX**: Built with Tailwind CSS and Shadcn UI components
+- 🔍 **SEO Optimized**: Enhanced metadata for search engine visibility
 
 ## 🚀 Getting Started
 

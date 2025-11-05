@@ -193,7 +193,102 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">7. Privacy and Data Security</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">7. Fair Usage Policy for Premium Users</h2>
+              
+              <h3 className="text-lg font-semibold text-white mb-3">7.1 Purpose</h3>
+              <p>
+                Our Fair Usage Policy ensures that all Premium users have access to high-quality service without 
+                disruption from excessive or abusive usage patterns. While Premium subscriptions include "unlimited" 
+                file processing, this is subject to reasonable and fair usage as outlined below.
+              </p>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.2 Reasonable Usage Guidelines</h3>
+              <p>
+                Premium users are expected to use the Service in a manner consistent with normal business or personal 
+                document processing needs. Reasonable usage includes:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li><strong>Individual/Personal Use:</strong> Up to 500 file operations per day (approximately 15,000 per month)</li>
+                <li><strong>Small Business Use:</strong> Up to 1,000 file operations per day (approximately 30,000 per month)</li>
+                <li><strong>Enterprise Use:</strong> Please contact sales@propdf.com for custom enterprise plans</li>
+                <li><strong>Cloud Storage:</strong> Up to 50 GB of stored files per account</li>
+                <li><strong>File Size:</strong> Individual files up to 1 GB (larger files may require longer processing times)</li>
+                <li><strong>Batch Operations:</strong> Up to 100 files per batch operation</li>
+              </ul>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.3 Excessive Usage</h3>
+              <p>
+                The following are considered excessive or abusive usage and may result in account restrictions:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Processing more than 2,000 files per day consistently</li>
+                <li>Using automated scripts or bots to submit files without prior approval</li>
+                <li>Reselling or redistributing our services to third parties</li>
+                <li>Creating multiple accounts to circumvent usage limits</li>
+                <li>Using the Service for cryptocurrency mining or similar resource-intensive activities</li>
+                <li>Storing more than 50 GB of files without upgrading to a higher-tier plan</li>
+                <li>Repeatedly uploading and deleting large files to abuse storage limits</li>
+              </ul>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.4 Monitoring and Enforcement</h3>
+              <p>
+                We monitor usage patterns to ensure compliance with this Fair Usage Policy:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li><strong>Automated Monitoring:</strong> System alerts for usage exceeding 150% of reasonable limits</li>
+                <li><strong>First Warning:</strong> Email notification when usage patterns appear excessive</li>
+                <li><strong>Second Warning:</strong> Temporary rate limiting (e.g., cooldown period between operations)</li>
+                <li><strong>Final Action:</strong> Account suspension or termination for continued violations</li>
+              </ul>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.5 Right to Appeal</h3>
+              <p>
+                If your account is flagged for excessive usage and you believe this is in error, you may:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Contact support@propdf.com within 14 days with an explanation of your usage needs</li>
+                <li>Provide documentation supporting legitimate high-volume usage (e.g., business requirements)</li>
+                <li>Request a custom enterprise plan with higher usage limits</li>
+              </ul>
+              <p className="mt-3">
+                We will review your case and may restore full access or recommend an appropriate plan for your needs.
+              </p>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.6 Enterprise and High-Volume Users</h3>
+              <p>
+                If you require higher usage limits or dedicated resources:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Contact sales@propdf.com for custom enterprise pricing</li>
+                <li>Enterprise plans include dedicated API access, higher rate limits, and priority support</li>
+                <li>Custom SLAs available for mission-critical operations</li>
+              </ul>
+
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">7.7 Policy Updates</h3>
+              <p>
+                We reserve the right to adjust Fair Usage Policy limits based on:
+              </p>
+              <ul className="list-disc list-inside space-y-2 ml-4">
+                <li>Infrastructure improvements or constraints</li>
+                <li>Changes in operating costs</li>
+                <li>Overall usage patterns across the platform</li>
+              </ul>
+              <p className="mt-3">
+                Premium users will be notified at least 30 days before any significant changes to usage limits.
+              </p>
+
+              <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-700/30">
+                <p className="text-sm text-blue-200">
+                  <strong>💡 Fair Usage Summary:</strong> Premium users enjoy generous usage limits designed for 
+                  normal business and personal needs. If you consistently exceed 500-1,000 file operations per day 
+                  or 50 GB storage, we may contact you to discuss upgrading to an enterprise plan. Reasonable usage 
+                  ensures quality service for all users.
+                </p>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold text-white mb-4">8. Privacy and Data Security</h2>
               <p>
                 Your privacy is important to us. Our data handling practices include:
               </p>
@@ -210,22 +305,22 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">8. Intellectual Property Rights</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">9. Intellectual Property Rights</h2>
               
-              <h3 className="text-lg font-semibold text-white mb-3">8.1 Our Intellectual Property</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">9.1 Our Intellectual Property</h3>
               <p>
                 All content, features, and functionality of the Service (including but not limited to text, graphics, logos, 
                 icons, images, audio clips, software, and code) are owned by PRO PDF and are protected by copyright, trademark, 
                 and other intellectual property laws.
               </p>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">8.2 Limited License</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">9.2 Limited License</h3>
               <p>
                 We grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Service 
                 for personal or business purposes in accordance with these Terms.
               </p>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">8.3 Your Content</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">9.3 Your Content</h3>
               <p>
                 You retain all rights to your files and content. By using our Service, you grant us a limited license to:
               </p>
@@ -240,9 +335,9 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">9. Service Availability and Support</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">10. Service Availability and Support</h2>
               
-              <h3 className="text-lg font-semibold text-white mb-3">9.1 Uptime and Availability</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">10.1 Uptime and Availability</h3>
               <p>
                 We strive to maintain 99.9% uptime but do not guarantee uninterrupted or error-free service. The Service 
                 may be temporarily unavailable due to:
@@ -255,7 +350,7 @@ export default function TermsPage() {
                 <li>Force majeure events</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">9.2 Customer Support</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">10.2 Customer Support</h3>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li><strong>Free Users:</strong> Community support and AI chatbot assistant</li>
                 <li><strong>Premium Users:</strong> Priority email support with 24-48 hour response time</li>
@@ -264,21 +359,21 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">10. Disclaimers and Limitations of Liability</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">11. Disclaimers and Limitations of Liability</h2>
               
-              <h3 className="text-lg font-semibold text-white mb-3">10.1 Service "As Is"</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">11.1 Service "As Is"</h3>
               <p>
                 THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, 
                 INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
               </p>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">10.2 No Liability for File Loss</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">11.2 No Liability for File Loss</h3>
               <p>
                 We are not responsible for any loss, corruption, or unauthorized access to your files. You are solely 
                 responsible for maintaining backups of important documents.
               </p>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">10.3 Limitation of Liability</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">11.3 Limitation of Liability</h3>
               <p>
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, PRO PDF SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
                 CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES, WHETHER INCURRED DIRECTLY OR INDIRECTLY, 
@@ -291,7 +386,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">11. Indemnification</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">12. Indemnification</h2>
               <p>
                 You agree to indemnify, defend, and hold harmless PRO PDF, its officers, directors, employees, and agents 
                 from and against any claims, liabilities, damages, losses, and expenses (including legal fees) arising out of:
@@ -305,15 +400,15 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">12. Dispute Resolution and Governing Law</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">13. Dispute Resolution and Governing Law</h2>
               
-              <h3 className="text-lg font-semibold text-white mb-3">12.1 Governing Law</h3>
+              <h3 className="text-lg font-semibold text-white mb-3">13.1 Governing Law</h3>
               <p>
                 These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], 
                 without regard to its conflict of law provisions.
               </p>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">12.2 Dispute Resolution</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">13.2 Dispute Resolution</h3>
               <p>
                 Any disputes arising from these Terms or the Service shall be resolved through:
               </p>
@@ -324,7 +419,7 @@ export default function TermsPage() {
                 <li>Each party bears their own costs unless otherwise awarded</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-white mb-3 mt-4">12.3 Class Action Waiver</h3>
+              <h3 className="text-lg font-semibold text-white mb-3 mt-4">13.3 Class Action Waiver</h3>
               <p>
                 You agree to resolve disputes on an individual basis only. You waive the right to participate in class actions 
                 or class-wide arbitration.
@@ -332,7 +427,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">13. Modification of Terms</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">14. Modification of Terms</h2>
               <p>
                 We reserve the right to modify these Terms at any time. We will notify you of significant changes by:
               </p>
@@ -349,7 +444,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">14. Termination</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">15. Termination</h2>
               <p>
                 We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason, 
                 including:
@@ -367,7 +462,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">15. Severability</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">16. Severability</h2>
               <p>
                 If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or 
                 eliminated to the minimum extent necessary, and the remaining provisions will remain in full force and effect.
@@ -375,7 +470,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">16. Entire Agreement</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">17. Entire Agreement</h2>
               <p>
                 These Terms, together with our Privacy Policy and any other legal notices published on the Service, 
                 constitute the entire agreement between you and PRO PDF regarding your use of the Service.
@@ -383,7 +478,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-white mb-4">17. Contact Information</h2>
+              <h2 className="text-xl font-semibold text-white mb-4">18. Contact Information</h2>
               <p>
                 For questions, concerns, or requests regarding these Terms of Service:
               </p>

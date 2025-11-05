@@ -19,16 +19,17 @@ const plans = [
     features: [
       { text: "All PDF operations", included: true },
       { text: "Max file size: 10MB", included: true },
+      { text: "5 files per session", included: true },
       { text: "Temporary file storage", included: true },
       { text: "Basic processing speed", included: true },
-      { text: "Watermark on outputs", included: false },
       { text: "Cloud storage", included: false },
       { text: "File history", included: false },
       { text: "Priority support", included: false }
     ],
     cta: "Try Now",
     href: "/#",
-    popular: false
+    popular: false,
+    note: null
   },
   {
     name: "Premium",
@@ -40,16 +41,18 @@ const plans = [
     features: [
       { text: "All PDF operations", included: true },
       { text: "Max file size: 1GB", included: true },
-      { text: "Cloud storage & sync", included: true },
+      { text: "Unlimited file processing", included: true },
+      { text: "50 GB cloud storage", included: true },
       { text: "Lightning fast processing", included: true },
       { text: "No watermarks", included: true },
       { text: "Complete file history", included: true },
-      { text: "Bulk operations", included: true },
+      { text: "Bulk operations (100 files)", included: true },
       { text: "Priority support", included: true }
     ],
     cta: "Start Free Trial",
     href: "/auth/signup",
-    popular: true
+    popular: true,
+    note: "Subject to fair usage policy"
   }
 ];
 
@@ -182,6 +185,18 @@ export function PricingSection() {
                     </div>
                   ))}
                 </div>
+
+                {/* Fair Usage Note */}
+                {plan.note && (
+                  <div className="pt-3 border-t border-slate-700/50">
+                    <p className="text-xs text-slate-400 text-center">
+                      * {plan.note} -{' '}
+                      <Link href="/terms" className="text-blue-400 hover:underline">
+                        View details
+                      </Link>
+                    </p>
+                  </div>
+                )}
 
                 {/* CTA Button */}
                 <Button
