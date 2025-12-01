@@ -14,8 +14,16 @@ import {
   Maximize2, 
   Loader2,
   RotateCw,
-  Download
+  Download,
+  RotateCcw
 } from 'lucide-react';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import * as pdfjsLib from 'pdfjs-dist';
 
@@ -157,12 +165,25 @@ export function PDFPreview({
     }
   }, [pdfDoc, renderPage]);
 
+  // Preset zoom levels for granular control
+  const zoomLevels = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0];
+
   const handleZoomIn = () => {
-    setScale(prev => Math.min(prev + 0.25, 4.0));
+    const currentIndex = zoomLevels.findIndex(level => level >= scale);
+    if (currentIndex < zoomLevels.length - 1) {
+      setScale(zoomLevels[currentIndex + 1]);
+    }
   };
 
   const handleZoomOut = () => {
-    setScale(prev => Math.max(prev - 0.25, 0.5));
+    const currentIndex = zoomLevels.findIndex(level => level >= scale);
+    if (currentIndex > 0) {
+      setScale(zoomLevels[currentIndex - 1]);
+    }
+  };
+
+  const handleZoomSelect = (value: string) => {
+    setScale(parseFloat(value));
   };
 
   const handlePrevPage = () => {
@@ -173,8 +194,25 @@ export function PDFPreview({
     setCurrentPage(prev => Math.min(prev + 1, numPages));
   };
 
-  const handleRotate = () => {
+  const handleRotateClockwise = () => {
     setRotation(prev => (prev + 90) % 360);
+  };
+
+  const handleRotateCounterClockwise = () => {
+    setRotation(prev => (prev - 90 + 360) % 360);
+  };
+
+  const handleRotationSelect = (value: string) => {
+    setRotation(parseInt(value));
+  };
+
+  const handleFitToWidth = () => {
+    if (containerRef.current && canvasRef.current) {
+      const containerWidth = containerRef.current.clientWidth - 32; // Account for padding
+      const pageWidth = canvasRef.current.width / (window.devicePixelRatio || 1);
+      const fitScale = containerWidth / pageWidth;
+      setScale(Math.min(Math.max(fitScale, 0.25), 4.0));
+    }
   };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -241,7 +279,7 @@ export function PDFPreview({
 
           {/* Controls */}
           {showControls && numPages > 0 && (
-            <div className="flex items-center justify-between bg-slate-900/50 p-3 rounded-lg gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between bg-slate-900/50 p-3 rounded-lg gap-4">
               {/* Page Navigation */}
               <div className="flex items-center space-x-2">
                 <TooltipProvider>
@@ -296,7 +334,7 @@ export function PDFPreview({
                         variant="ghost"
                         size="sm"
                         onClick={handleZoomOut}
-                        disabled={scale <= 0.5}
+                        disabled={scale <= 0.25}
                         className="h-8 w-8 p-0"
                       >
                         <ZoomOut className="w-4 h-4" />
@@ -308,9 +346,24 @@ export function PDFPreview({
                   </Tooltip>
                 </TooltipProvider>
 
-                <span className="text-sm text-slate-300 min-w-[50px] text-center">
-                  {Math.round(scale * 100)}%
-                </span>
+                <Select value={scale.toString()} onValueChange={handleZoomSelect}>
+                  <SelectTrigger className="w-[100px] h-8 text-sm bg-slate-800 border-slate-600">
+                    <SelectValue>{Math.round(scale * 100)}%</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0.25">25%</SelectItem>
+                    <SelectItem value="0.5">50%</SelectItem>
+                    <SelectItem value="0.75">75%</SelectItem>
+                    <SelectItem value="1.0">100%</SelectItem>
+                    <SelectItem value="1.25">125%</SelectItem>
+                    <SelectItem value="1.5">150%</SelectItem>
+                    <SelectItem value="1.75">175%</SelectItem>
+                    <SelectItem value="2.0">200%</SelectItem>
+                    <SelectItem value="2.5">250%</SelectItem>
+                    <SelectItem value="3.0">300%</SelectItem>
+                    <SelectItem value="4.0">400%</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 <TooltipProvider>
                   <Tooltip>
@@ -330,26 +383,77 @@ export function PDFPreview({
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleFitToWidth}
+                        className="h-8 px-2 text-xs"
+                      >
+                        <Maximize2 className="w-3 h-3 mr-1" />
+                        Fit
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Fit to width</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
 
-              {/* Rotate Control */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleRotate}
-                      className="h-8 w-8 p-0"
-                    >
-                      <RotateCw className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Rotate page</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              {/* Rotation Controls */}
+              <div className="flex items-center space-x-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRotateCounterClockwise}
+                        className="h-8 w-8 p-0"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Rotate counter-clockwise</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
+                <Select value={rotation.toString()} onValueChange={handleRotationSelect}>
+                  <SelectTrigger className="w-[90px] h-8 text-sm bg-slate-800 border-slate-600">
+                    <SelectValue>{rotation}°</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">0°</SelectItem>
+                    <SelectItem value="90">90°</SelectItem>
+                    <SelectItem value="180">180°</SelectItem>
+                    <SelectItem value="270">270°</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleRotateClockwise}
+                        className="h-8 w-8 p-0"
+                      >
+                        <RotateCw className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Rotate clockwise</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
           )}
 
