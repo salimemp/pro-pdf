@@ -21,7 +21,12 @@ import {
   Layers,
   Crop,
   Edit,
-  Code
+  Code,
+  MessageSquare,
+  Sparkles,
+  Stamp,
+  FileCheck,
+  EyeOff
 } from "lucide-react";
 import { useTranslation } from "@/lib/i18n/context";
 
@@ -78,6 +83,31 @@ export function FeaturesSection() {
       icon: Code,
       title: 'HTML to PDF',
       description: 'Convert HTML content or websites to PDF format'
+    },
+    {
+      icon: MessageSquare,
+      title: 'Annotations & Comments',
+      description: 'Add comments, highlights, shapes, and text annotations to your PDFs'
+    },
+    {
+      icon: Sparkles,
+      title: 'AI Summary',
+      description: 'Generate intelligent summaries, key points, and insights using AI'
+    },
+    {
+      icon: Stamp,
+      title: 'Professional Stamps',
+      description: 'Add pre-defined or custom stamps like "Approved", "Confidential", "Draft"'
+    },
+    {
+      icon: FileCheck,
+      title: 'PDF Comparison',
+      description: 'Compare two PDFs side-by-side and identify differences'
+    },
+    {
+      icon: EyeOff,
+      title: 'Redact PDF',
+      description: 'Permanently remove sensitive information from your documents'
     },
     {
       icon: Type,

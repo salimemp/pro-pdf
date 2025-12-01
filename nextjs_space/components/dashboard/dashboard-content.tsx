@@ -22,7 +22,12 @@ import {
   History,
   Settings,
   BarChart3,
-  Clock
+  Clock,
+  MessageSquare,
+  Sparkles,
+  Stamp,
+  FileCheck,
+  EyeOff
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -68,6 +73,48 @@ const pdfTools = [
     description: 'Add digital signatures',
     icon: PenTool,
     color: 'bg-red-500'
+  },
+  {
+    id: 'annotate',
+    title: 'Annotate & Comment',
+    description: 'Add comments and annotations',
+    icon: MessageSquare,
+    color: 'bg-indigo-500'
+  },
+  {
+    id: 'ai-summary',
+    title: 'AI Summary',
+    description: 'Generate AI-powered summaries',
+    icon: Sparkles,
+    color: 'bg-violet-500'
+  },
+  {
+    id: 'stamp',
+    title: 'Add Stamps',
+    description: 'Professional document stamps',
+    icon: Stamp,
+    color: 'bg-orange-500'
+  },
+  {
+    id: 'compare',
+    title: 'Compare PDFs',
+    description: 'Find differences between PDFs',
+    icon: FileCheck,
+    color: 'bg-teal-500'
+  },
+  {
+    id: 'redact',
+    title: 'Redact',
+    description: 'Remove sensitive information',
+    icon: EyeOff,
+    color: 'bg-rose-500'
+  },
+  {
+    id: 'fill-sign',
+    title: 'Fill & Sign',
+    description: 'Fill forms and add signatures',
+    icon: PenTool,
+    color: 'bg-cyan-500'
   }
 ];
 
@@ -315,7 +362,13 @@ export function DashboardContent() {
                   compress: '/tools/compress',
                   'extract-text': '/tools/convert',
                   convert: '/tools/convert',
-                  sign: '/tools/sign'
+                  sign: '/tools/sign',
+                  annotate: '/tools/annotate',
+                  'ai-summary': '/tools/ai-summary',
+                  stamp: '/tools/stamp',
+                  compare: '/tools/compare',
+                  redact: '/tools/redact',
+                  'fill-sign': '/tools/fill-sign'
                 };
                 const route = toolRoutes[selectedTool] || '/tools/merge';
                 window.location.href = route;
