@@ -10,6 +10,56 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 
 ![PRO PDF](./public/og-image.png)
 
+## 📊 Feature Overview
+
+| Category | Tools |
+|----------|-------|
+| **Core PDF Tools** | 14 tools (Convert, Merge, Split, Compress, etc.) |
+| **Advanced Features** | 6 tools (Annotations, AI Summary, Stamps, Compare, Redact, Fill & Sign) |
+| **AI-Powered** | 2 features (AI Summary, Chatbot Assistant) |
+| **Security Tools** | 4 features (Encrypt, Decrypt, Redact, Password Protection) |
+| **Collaboration** | 3 features (Annotations, Comments, Stamps) |
+| **Total PDF Tools** | **20+ comprehensive tools** |
+
+## 🆕 What's New in Latest Release
+
+### Version 2.0 - Advanced PDF Suite (December 2025)
+
+**🚀 Major Features:**
+- ✅ PDF Annotations & Comments system with drawing tools
+- ✅ AI-Powered PDF Summary with Abacus.AI integration
+- ✅ Professional Document Stamps (8 pre-defined + custom)
+- ✅ PDF Comparison tool with side-by-side diff visualization
+- ✅ Redaction tool for permanently removing sensitive data
+- ✅ Fill & Sign forms with digital signature support
+
+**♿ Accessibility Enhancements:**
+- ✅ WCAG 2.1 compliant accessibility controls
+- ✅ High contrast mode
+- ✅ Text-to-speech reader
+- ✅ Keyboard shortcuts and screen reader support
+
+**🎨 UX Improvements:**
+- ✅ Interactive onboarding with 6-slide tutorial
+- ✅ Rollback/undo feature for PDF operations
+- ✅ Professional pill-shaped accessibility button
+- ✅ Floating AI chatbot assistant
+
+**📊 Dashboard Updates:**
+- ✅ 12 tools available from dashboard (6 new + 6 existing)
+- ✅ Color-coded tool cards with unique gradients
+- ✅ Quick file upload and tool selection
+
+**🔒 Security:**
+- ✅ Password breach checking with HIBP integration
+- ✅ 7-day refund policy update
+- ✅ Enhanced security activity logging
+
+**🧪 Quality:**
+- ✅ Comprehensive E2E test suite with Playwright
+- ✅ CI/CD pipeline with GitHub Actions
+- ✅ Monitoring with Prometheus + Grafana Cloud
+
 ## 🌟 Features
 
 ### Core PDF Tools
@@ -28,12 +78,80 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 - **Crop PDF**: Trim and adjust PDF page margins
 - **Edit PDF**: Modify text and content in PDF documents
 
+### 🆕 Advanced PDF Tools
+
+#### Collaboration & Annotation
+- **📝 Annotations & Comments**: Add text comments, highlights, shapes (rectangles, circles, arrows), and sticky notes to PDFs
+  - Interactive canvas-based drawing tools
+  - 6 professional color options
+  - Undo/Redo functionality with full history
+  - Multi-page annotation support
+  - Export annotated PDFs with embedded annotations
+
+#### AI-Powered Features
+- **🤖 AI Summary**: Generate intelligent document summaries powered by Abacus.AI LLM APIs
+  - Quick 2-3 sentence overview
+  - Extract 5-7 key points automatically
+  - Identify 3-5 deeper insights and implications
+  - Generate 3-5 actionable recommendations
+  - Sentiment analysis (Positive/Neutral/Negative/Mixed)
+  - Word count and reading time estimation
+  - Tabbed interface for easy navigation
+  - Export summaries to text files
+
+#### Document Management
+- **🏷️ Professional Stamps**: Add official stamps to documents
+  - 8 pre-defined stamps: APPROVED, REJECTED, CONFIDENTIAL, DRAFT, REVIEWED, URGENT, FINAL, VOID
+  - Custom text stamps with any text
+  - Image stamp upload (logos, signatures)
+  - Include date and user name options
+  - Color-coded stamps by type
+  - Multi-page stamp placement
+
+#### Comparison & Analysis
+- **🔍 PDF Compare**: Side-by-side document comparison
+  - Three-panel view (Document 1, Document 2, Differences)
+  - Pixel-level difference detection
+  - Highlight changes in red overlay
+  - Page-by-page navigation
+  - Difference count and tracking
+  - Generate comparison reports
+  - Detect page count differences
+
+#### Security & Privacy
+- **⬛ Redact PDF**: Permanently remove sensitive information
+  - Manual redaction with click-and-drag selection
+  - Search and redact specific terms automatically
+  - Multi-page redaction support
+  - Redaction area management and preview
+  - Permanent black-out with no recovery
+  - Safety warnings and confirmation
+
+#### Form Processing
+- **🖊️ Fill & Sign**: Complete and sign PDF forms digitally
+  - Add text fields with custom content
+  - Insert date fields (auto-populated)
+  - Add checkboxes
+  - Draw digital signatures with mouse/touch
+  - Save and reuse signatures
+  - Multi-page form support
+  - Field tracking and management
+
 ### User Experience
 - 🌓 **Dark/Light Theme**: Toggle between light and dark modes
 - 🌍 **Multi-Language Support**: English, Spanish, French, German, Italian, Chinese, Arabic, and Hindi
-- 💬 **AI Chatbot Assistant**: Intelligent help system powered by LLM
+- 💬 **AI Chatbot Assistant**: Intelligent help system powered by LLM (bottom-right floating chatbot)
+- ♿ **Accessibility Features**: WCAG 2.1 compliant with comprehensive accessibility controls
+  - High contrast mode for better visibility
+  - Text-to-speech reader for document content
+  - Keyboard shortcuts (Ctrl+Shift+C for contrast, Ctrl+Shift+R for read aloud, Escape to stop)
+  - Screen reader support with ARIA live regions
+  - Professional pill-shaped accessibility button (bottom-left)
+  - Skip navigation links for keyboard users
+- 🎬 **Interactive Onboarding**: 6-slide welcome tutorial for new users
 - 📱 **Responsive Design**: Optimized for all screen sizes
 - 🎯 **Intuitive UI**: Clean, modern interface with smooth animations
+- 🔄 **Rollback Feature**: Undo PDF operations within 1-hour window (up to 10 operations)
 
 ### Security & Privacy
 - 🔐 **End-to-End Encryption**: Client-side processing for maximum privacy
@@ -140,46 +258,108 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Test Credentials
+
+For testing purposes, use these credentials (seeded in the database):
+
+```
+Email: john@doe.com
+Password: johndoe123
+Account Type: Premium User
+Features: Full access to all PDF tools
+```
+
+**Note:** This is a test account with premium features enabled. In production, you'll need to create your own account and upgrade to Premium via Stripe checkout.
+
 ## 🏗️ Project Structure
 
 ```
 nextjs_space/
 ├── app/                      # Next.js 14 App Router
 │   ├── api/                  # API routes
-│   │   ├── auth/            # Authentication endpoints
+│   │   ├── ai-summary/      # 🆕 AI summary generation endpoint
+│   │   ├── auth/            # Authentication endpoints (login, 2FA, reset, verify)
 │   │   ├── chatbot/         # AI assistant endpoint
+│   │   ├── compliance/      # GDPR/HIPAA compliance endpoints
 │   │   ├── jobs/            # Scheduled jobs
+│   │   ├── metrics/         # Prometheus metrics & health
+│   │   ├── security/        # Security logs
 │   │   ├── sessions/        # Session management
 │   │   ├── user/            # User data & settings
 │   │   └── webhooks/        # Stripe webhooks
 │   ├── auth/                # Auth pages (login, signup)
-│   ├── dashboard/           # User dashboard
+│   ├── dashboard/           # User dashboard with all tools
+│   ├── jobs/                # Scheduled jobs management page
+│   ├── settings/            # User settings & privacy controls
 │   ├── tools/               # PDF tool pages
-│   │   ├── convert/
-│   │   ├── merge/
-│   │   ├── split/
+│   │   ├── annotate/        # 🆕 PDF annotations & comments
+│   │   ├── ai-summary/      # 🆕 AI-powered PDF summary
+│   │   ├── compare/         # 🆕 PDF comparison tool
 │   │   ├── compress/
-│   │   ├── encrypt/
+│   │   ├── convert/
+│   │   ├── crop/
 │   │   ├── decrypt/
-│   │   └── sign/
-│   └── [other pages]/       # About, Pricing, Help, etc.
+│   │   ├── edit/
+│   │   ├── encrypt/
+│   │   ├── fill-sign/       # 🆕 Fill & sign PDF forms
+│   │   ├── html-to-pdf/
+│   │   ├── merge/
+│   │   ├── organize/
+│   │   ├── page-numbers/
+│   │   ├── redact/          # 🆕 Redact sensitive information
+│   │   ├── rotate/
+│   │   ├── sign/
+│   │   ├── split/
+│   │   ├── stamp/           # 🆕 Professional document stamps
+│   │   └── watermark/
+│   └── [other pages]/       # About, Contact, Help, Pricing, Terms, Privacy
 ├── components/              # React components
-│   ├── ui/                  # Shadcn UI components
-│   ├── auth/                # Auth forms
+│   ├── ui/                  # Shadcn UI components (50+ components)
+│   ├── auth/                # Auth forms (login, signup, social login, 2FA)
+│   ├── compliance/          # Privacy dashboard components
 │   ├── dashboard/           # Dashboard components
+│   ├── jobs/                # Job configuration & management
+│   ├── settings/            # Security & privacy settings
+│   ├── accessibility-manager.tsx  # 🆕 WCAG 2.1 accessibility controls
+│   ├── floating-chatbot.tsx       # AI assistant interface
+│   ├── onboarding-slides.tsx      # 🆕 Interactive tutorial
+│   ├── rollback-history.tsx       # 🆕 Operation undo feature
 │   └── [other components]/
 ├── lib/                     # Utility libraries
 │   ├── pdf-utils/          # PDF processing logic
-│   ├── i18n/               # Internationalization
+│   ├── i18n/               # Internationalization (8 languages)
+│   ├── monitoring/         # Prometheus metrics collection
+│   ├── 2fa.ts              # Two-factor authentication
 │   ├── auth.ts             # Auth configuration
+│   ├── compliance.ts       # GDPR/HIPAA compliance
 │   ├── db.ts               # Database client
 │   ├── encryption.ts       # Encryption utilities
+│   ├── password-breach-check.ts  # HIBP integration
+│   ├── rate-limit.ts       # API rate limiting
+│   ├── rollback-manager.ts       # 🆕 Operation history
+│   ├── security-logger.ts  # Security event logging
 │   └── [other utilities]/
 ├── prisma/                  # Database schema
-│   └── schema.prisma
+│   └── schema.prisma       # User, Session, ScheduledJob models
 ├── public/                  # Static assets
-│   └── workers/            # Web Workers for PDF processing
-└── e2e/                     # Playwright E2E tests
+│   ├── workers/            # Web Workers for PDF processing
+│   ├── favicon.svg
+│   ├── og-image.png
+│   └── robots.txt
+├── monitoring/              # Observability setup
+│   ├── grafana/            # Pre-built dashboards
+│   ├── prometheus/         # Prometheus config
+│   └── QUICK_START.md
+├── e2e/                     # Playwright E2E tests
+│   ├── auth.spec.ts        # Authentication flows
+│   ├── dashboard.spec.ts   # Dashboard functionality
+│   ├── home.spec.ts        # Homepage & navigation
+│   ├── language.spec.ts    # Multi-language support
+│   ├── theme.spec.ts       # Dark/Light theme
+│   └── tools.spec.ts       # PDF tool operations
+└── scripts/                 # Build & maintenance scripts
+    ├── generate-translations.ts
+    └── seed.ts             # Database seeding
 ```
 
 ## 🧪 Testing
@@ -346,17 +526,34 @@ Edit `app/globals.css` to customize colors and styles:
 ## 📚 API Documentation
 
 ### Authentication Endpoints
-- `POST /api/auth/signin` - User login
+- `POST /api/auth/login` - User login with email/password
 - `POST /api/signup` - User registration
 - `POST /api/auth/verify-email` - Email verification
-- `POST /api/auth/reset-password` - Password reset
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password` - Reset password with token
+- `POST /api/auth/resend-verification` - Resend verification email
+- `POST /api/auth/check-2fa` - Check if user has 2FA enabled
+- `POST /api/auth/verify-login` - Verify login with 2FA code
+- `POST /api/auth/2fa/setup` - Initialize 2FA setup
+- `POST /api/auth/2fa/verify` - Verify and enable 2FA
+- `POST /api/auth/2fa/disable` - Disable 2FA
+- `GET /api/auth/2fa/backup-codes` - Generate backup codes
+- `POST /api/auth/check-password-breach` - Check password against breach database
+
+### AI-Powered Features 🆕
+- `POST /api/ai-summary` - Generate AI-powered PDF summary
+  - Accepts: FormData with PDF file
+  - Returns: Streaming response with summary, key points, insights, action items
 
 ### User Management
 - `GET /api/user/profile` - Get user profile
 - `PUT /api/user/profile` - Update profile
-- `POST /api/user/setup-2fa` - Enable 2FA
-- `DELETE /api/user/account` - Delete account
+- `POST /api/user/change-password` - Change password
+- `DELETE /api/user/delete-account` - Delete account
 - `GET /api/user/data-export` - Export user data (GDPR)
+- `GET /api/user/stats` - Get user statistics and usage
+- `GET /api/user/consent` - Get user consent status
+- `POST /api/user/consent` - Update user consent preferences
 
 ### Chatbot
 - `POST /api/chatbot` - Send message to AI assistant
@@ -365,6 +562,33 @@ Edit `app/globals.css` to customize colors and styles:
 - `GET /api/sessions` - List upload sessions
 - `POST /api/sessions` - Create new session
 - `DELETE /api/sessions/:id` - Delete session
+
+### Compliance & Privacy
+- `GET /api/compliance/status` - Get compliance status
+- `POST /api/compliance/consent` - Update consent preferences
+- `GET /api/compliance/export` - Export user data
+- `POST /api/compliance/delete-account` - Request account deletion
+
+### Security
+- `GET /api/security/logs` - Get security activity logs
+- `POST /api/security/logs` - Log security event
+
+### Jobs & Automation
+- `GET /api/jobs` - List scheduled jobs
+- `POST /api/jobs` - Create new scheduled job
+- `GET /api/jobs/:id` - Get job details
+- `PUT /api/jobs/:id` - Update job configuration
+- `DELETE /api/jobs/:id` - Delete scheduled job
+- `POST /api/jobs/:id/retry` - Retry failed job
+- `GET /api/jobs/:id/progress` - Get job progress
+
+### Monitoring
+- `GET /api/metrics` - Prometheus metrics endpoint
+- `GET /api/metrics/health` - Health check endpoint
+
+### Payments
+- `POST /api/create-checkout-session` - Create Stripe checkout session
+- `POST /api/webhooks/stripe` - Handle Stripe webhooks
 
 ## 🤝 Support
 
@@ -379,16 +603,52 @@ This project is proprietary software. All rights reserved.
 
 ## 🙏 Acknowledgments
 
-Built with:
-- [Next.js](https://nextjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Shadcn UI](https://ui.shadcn.com/)
-- [Prisma](https://www.prisma.io/)
-- [NextAuth.js](https://next-auth.js.org/)
-- [pdf-lib](https://pdf-lib.js.org/)
-- [Stripe](https://stripe.com/)
-- [Playwright](https://playwright.dev/)
+### Core Technologies
+- [Next.js 14](https://nextjs.org/) - React framework with App Router
+- [TypeScript 5.2](https://www.typescriptlang.org/) - Type-safe JavaScript
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Shadcn UI](https://ui.shadcn.com/) - Re-usable component library
+- [Prisma](https://www.prisma.io/) - Next-generation ORM
+- [PostgreSQL](https://www.postgresql.org/) - Robust database system
+
+### Authentication & Security
+- [NextAuth.js v4](https://next-auth.js.org/) - Authentication for Next.js
+- [bcryptjs](https://github.com/dcodeIO/bcrypt.js) - Password hashing
+- [speakeasy](https://github.com/speakeasyjs/speakeasy) - 2FA implementation
+- [Have I Been Pwned API](https://haveibeenpwned.com/API/v3) - Password breach checking
+
+### PDF Processing
+- [pdf-lib](https://pdf-lib.js.org/) - PDF creation and manipulation
+- [PDF.js](https://mozilla.github.io/pdf.js/) - PDF rendering in browser
+- [react-signature-canvas](https://github.com/agilgur5/react-signature-canvas) - Digital signatures
+- [canvas-confetti](https://github.com/catdad/canvas-confetti) - Celebration effects
+
+### AI & LLM Integration
+- [Abacus.AI APIs](https://abacus.ai/) - LLM-powered features (gpt-4.1-mini)
+- OpenAI-compatible streaming endpoints
+
+### Payments & Subscriptions
+- [Stripe](https://stripe.com/) - Payment processing
+
+### Monitoring & Observability
+- [Prometheus](https://prometheus.io/) - Metrics collection
+- [Grafana](https://grafana.com/) - Dashboards and visualization
+- [prom-client](https://github.com/siimon/prom-client) - Prometheus metrics for Node.js
+
+### Testing
+- [Playwright](https://playwright.dev/) - End-to-end testing
+- [TypeScript ESLint](https://typescript-eslint.io/) - Linting
+
+### UI Libraries & Animation
+- [Framer Motion](https://www.framer.com/motion/) - Animation library
+- [Lucide React](https://lucide.dev/) - Icon library
+- [Sonner](https://sonner.emilkowal.ski/) - Toast notifications
+- [React Hook Form](https://react-hook-form.com/) - Form validation
+- [Zod](https://zod.dev/) - Schema validation
+
+### Storage & Cloud Services
+- [AWS S3](https://aws.amazon.com/s3/) - Cloud file storage
+- [AWS SDK v3](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/) - AWS integration
 
 ---
 
