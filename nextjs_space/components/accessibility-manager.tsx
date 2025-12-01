@@ -226,17 +226,30 @@ export function AccessibilityToolbar() {
 
   return (
     <>
-      {/* Floating Button - Left Side */}
-      <div className="fixed bottom-6 left-6 z-40">
+      {/* Floating Button - Professional Design with Label */}
+      <div className="fixed bottom-6 left-6 z-40 group">
         <Button
           onClick={() => setIsOpen(!isOpen)}
-          size="lg"
-          className="rounded-full w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-2xl transition-all duration-300 hover:scale-110 border-2 border-purple-400/30"
+          className="h-14 px-4 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-700 hover:via-purple-800 hover:to-indigo-800 shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-white/20 hover:border-white/30 rounded-full flex items-center gap-2"
           aria-label="Open accessibility menu"
           title="Accessibility Options"
         >
-          <Accessibility className="w-7 h-7 text-white" />
+          {/* Icon with subtle background */}
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Accessibility className="w-5 h-5 text-white" strokeWidth={2.5} />
+          </div>
+          
+          {/* Label Text */}
+          <span className="font-semibold text-white text-sm pr-1">
+            Accessibility
+          </span>
         </Button>
+
+        {/* Tooltip for extra clarity */}
+        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-purple-500/30">
+          ♿ Click to open accessibility options
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-purple-500/30"></div>
+        </div>
       </div>
 
       {/* Accessibility Panel - Professional Design */}

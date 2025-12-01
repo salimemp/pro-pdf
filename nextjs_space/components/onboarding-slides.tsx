@@ -69,17 +69,36 @@ export function OnboardingSlides() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    // Check if user has seen onboarding
-    const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeenOnboarding) {
-      // Show onboarding after cookie consent has been displayed
-      setTimeout(() => setOpen(true), 2000);
+    // Check if user has seen onboarding (client-side only)
+    if (typeof window !== 'undefined') {
+      const hasSeenOnboarding = localStorage.getItem('pro_pdf_onboarding_completed');
+      if (!hasSeenOnboarding) {
+        // Show onboarding after a short delay for better UX
+        const timer = setTimeout(() => setOpen(true), 1500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
+  // Listen for custom event to manually trigger onboarding
+  useEffect(() => {
+    const handleShowOnboarding = () => {
+      setCurrentSlide(0);
+      setOpen(true);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('showOnboarding', handleShowOnboarding);
+      return () => window.removeEventListener('showOnboarding', handleShowOnboarding);
     }
   }, []);
 
   const handleComplete = () => {
-    localStorage.setItem('hasSeenOnboarding', 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pro_pdf_onboarding_completed', 'true');
+    }
     setOpen(false);
+    setCurrentSlide(0); // Reset for next time
   };
 
   const handleNext = () => {
