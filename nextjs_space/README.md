@@ -1,6 +1,11 @@
 
 # PRO PDF - Professional PDF Converter & Editor
 
+[![CI/CD Pipeline](https://github.com/salimemp/pro-pdf/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/salimemp/pro-pdf/actions/workflows/ci-cd.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black.svg)](https://nextjs.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 A comprehensive, secure, and feature-rich PDF processing web application built with Next.js 14, TypeScript, and modern web technologies.
 
 ![PRO PDF](./public/og-image.png)
