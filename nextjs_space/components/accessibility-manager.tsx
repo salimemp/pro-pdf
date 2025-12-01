@@ -226,82 +226,142 @@ export function AccessibilityToolbar() {
 
   return (
     <>
-      {/* Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Floating Button - Left Side */}
+      <div className="fixed bottom-6 left-6 z-40">
         <Button
           onClick={() => setIsOpen(!isOpen)}
           size="lg"
-          className="rounded-full w-14 h-14 bg-blue-600 hover:bg-blue-700 shadow-lg"
+          className="rounded-full w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-2xl transition-all duration-300 hover:scale-110 border-2 border-purple-400/30"
           aria-label="Open accessibility menu"
+          title="Accessibility Options"
         >
-          <Accessibility className="w-6 h-6" />
+          <Accessibility className="w-7 h-7 text-white" />
         </Button>
       </div>
 
-      {/* Accessibility Panel */}
+      {/* Accessibility Panel - Professional Design */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80">
-          <Card className="bg-slate-800 border-slate-700 shadow-xl">
-            <div className="p-4 border-b border-slate-700">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Accessibility className="w-5 h-5" />
-                Accessibility
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Enhance your experience
-              </p>
+        <div className="fixed bottom-24 left-6 z-40 w-96 animate-in slide-in-from-bottom-5 duration-300">
+          <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/30 shadow-2xl backdrop-blur-xl">
+            {/* Header with Gradient */}
+            <div className="p-5 border-b border-purple-500/20 bg-gradient-to-r from-purple-600/10 to-indigo-600/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg">
+                    <Accessibility className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Accessibility</h3>
+                    <p className="text-xs text-purple-300">
+                      Enhance your experience
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsOpen(false)}
+                  className="text-slate-400 hover:text-white hover:bg-purple-600/20"
+                  aria-label="Close accessibility menu"
+                >
+                  ✕
+                </Button>
+              </div>
             </div>
 
-            <div className="p-4 space-y-3">
+            <div className="p-5 space-y-3">
               {/* High Contrast */}
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start h-12 bg-slate-800/50 border-purple-500/30 hover:bg-purple-600/20 hover:border-purple-500/50 text-white transition-all duration-200"
                 onClick={toggleHighContrast}
               >
-                <Eye className="w-4 h-4 mr-2" />
-                {highContrast ? 'Disable' : 'Enable'} High Contrast
+                <div className="flex items-center gap-3 w-full">
+                  <div className="w-8 h-8 rounded-lg bg-purple-600/20 flex items-center justify-center">
+                    <Eye className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="font-medium text-sm">High Contrast Mode</div>
+                    <div className="text-xs text-slate-400">
+                      {highContrast ? 'Currently enabled' : 'Better visibility'}
+                    </div>
+                  </div>
+                  <div className={`px-2 py-1 rounded text-xs font-medium ${
+                    highContrast 
+                      ? 'bg-green-600/20 text-green-400 border border-green-500/30' 
+                      : 'bg-slate-700 text-slate-400'
+                  }`}>
+                    {highContrast ? 'ON' : 'OFF'}
+                  </div>
+                </div>
               </Button>
 
               {/* Read Aloud Controls */}
               <div className="space-y-2">
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="w-full justify-start h-12 bg-slate-800/50 border-purple-500/30 hover:bg-purple-600/20 hover:border-purple-500/50 text-white transition-all duration-200"
                   onClick={handleReadPageContent}
                   disabled={isReading}
                 >
-                  <Volume2 className="w-4 h-4 mr-2" />
-                  Read Page Content
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-600/20 flex items-center justify-center">
+                      <Volume2 className="w-4 h-4 text-indigo-400" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <div className="font-medium text-sm">Read Aloud</div>
+                      <div className="text-xs text-slate-400">
+                        {isReading ? 'Reading...' : 'Listen to page content'}
+                      </div>
+                    </div>
+                  </div>
                 </Button>
 
                 {isReading && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={stopReading}
-                    >
-                      <VolumeX className="w-4 h-4 mr-1" />
-                      Stop
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start h-10 bg-red-900/20 border-red-500/30 hover:bg-red-600/20 text-red-400 hover:text-red-300"
+                    onClick={stopReading}
+                  >
+                    <VolumeX className="w-4 h-4 mr-2" />
+                    Stop Reading
+                  </Button>
                 )}
               </div>
 
               {/* Keyboard Shortcuts */}
-              <div className="pt-3 border-t border-slate-700">
-                <p className="text-xs font-medium text-slate-300 mb-2 flex items-center gap-1">
-                  <Keyboard className="w-3 h-3" />
-                  Keyboard Shortcuts
-                </p>
-                <div className="space-y-1 text-xs text-slate-400">
-                  <div>Ctrl+Shift+C: Toggle Contrast</div>
-                  <div>Ctrl+Shift+R: Read Aloud</div>
-                  <div>Esc: Stop Reading</div>
-                  <div>Tab: Navigate Elements</div>
+              <div className="pt-4 border-t border-purple-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Keyboard className="w-4 h-4 text-purple-400" />
+                  <p className="text-sm font-semibold text-white">
+                    Keyboard Shortcuts
+                  </p>
                 </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                    <span className="text-slate-400">Toggle Contrast</span>
+                    <kbd className="px-2 py-1 bg-slate-700 rounded text-purple-300 font-mono">Ctrl+Shift+C</kbd>
+                  </div>
+                  <div className="flex items-center justify-between text-xs bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                    <span className="text-slate-400">Read Aloud</span>
+                    <kbd className="px-2 py-1 bg-slate-700 rounded text-purple-300 font-mono">Ctrl+Shift+R</kbd>
+                  </div>
+                  <div className="flex items-center justify-between text-xs bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                    <span className="text-slate-400">Stop Reading</span>
+                    <kbd className="px-2 py-1 bg-slate-700 rounded text-purple-300 font-mono">Esc</kbd>
+                  </div>
+                  <div className="flex items-center justify-between text-xs bg-slate-800/50 rounded-lg p-2 border border-slate-700/50">
+                    <span className="text-slate-400">Navigate</span>
+                    <kbd className="px-2 py-1 bg-slate-700 rounded text-purple-300 font-mono">Tab</kbd>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer Info */}
+              <div className="pt-3 border-t border-purple-500/20">
+                <p className="text-xs text-center text-slate-400">
+                  💡 Designed for everyone, accessible to all
+                </p>
               </div>
             </div>
           </Card>
