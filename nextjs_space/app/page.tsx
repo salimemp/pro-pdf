@@ -16,7 +16,7 @@ export default function HomePage() {
         <AdPlaceholder variant="banner" />
       </div>
       
-      <main>
+      <main id="main-content" role="main">
         <HeroSection />
         
         {/* Mid-content Ad */}

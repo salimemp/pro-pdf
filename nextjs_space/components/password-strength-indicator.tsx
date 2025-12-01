@@ -1,13 +1,14 @@
 
 'use client';
 
-import React from 'react';
-import { Check, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, X, AlertTriangle, Shield, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PasswordStrengthIndicatorProps {
   password: string;
   className?: string;
+  onBreachCheck?: (isCompromised: boolean) => void;
 }
 
 interface PasswordRequirement {
@@ -15,7 +16,23 @@ interface PasswordRequirement {
   met: boolean;
 }
 
-export function PasswordStrengthIndicator({ password, className }: PasswordStrengthIndicatorProps) {
+interface BreachCheckResult {
+  isCompromised: boolean;
+  breachCount: number;
+  message: string;
+  checked: boolean;
+  loading: boolean;
+}
+
+export function PasswordStrengthIndicator({ password, className, onBreachCheck }: PasswordStrengthIndicatorProps) {
+  const [breachCheck, setBreachCheck] = useState<BreachCheckResult>({
+    isCompromised: false,
+    breachCount: 0,
+    message: '',
+    checked: false,
+    loading: false,
+  });
+
   const requirements: PasswordRequirement[] = [
     {
       label: 'At least 8 characters',
@@ -41,6 +58,56 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
 
   const metCount = requirements.filter((req) => req.met).length;
   const strength = metCount === 0 ? 0 : Math.ceil((metCount / requirements.length) * 100);
+
+  // Breach check with debouncing
+  useEffect(() => {
+    // Reset breach check when password changes
+    setBreachCheck(prev => ({ ...prev, checked: false, loading: false }));
+
+    // Only check if password meets all basic requirements
+    if (metCount < requirements.length || !password || password.length < 8) {
+      return;
+    }
+
+    // Debounce API call
+    const timeoutId = setTimeout(async () => {
+      setBreachCheck(prev => ({ ...prev, loading: true }));
+
+      try {
+        const response = await fetch('/api/auth/check-password-breach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+
+        const data = await response.json();
+        
+        setBreachCheck({
+          isCompromised: data.isCompromised,
+          breachCount: data.breachCount,
+          message: data.message,
+          checked: true,
+          loading: false,
+        });
+
+        // Notify parent component
+        if (onBreachCheck) {
+          onBreachCheck(data.isCompromised);
+        }
+      } catch (error) {
+        console.error('Breach check error:', error);
+        setBreachCheck({
+          isCompromised: false,
+          breachCount: 0,
+          message: 'Unable to verify password security',
+          checked: true,
+          loading: false,
+        });
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [password, metCount, requirements.length, onBreachCheck]);
 
   const getStrengthLabel = () => {
     if (strength === 0) return 'No password';
@@ -101,6 +168,47 @@ export function PasswordStrengthIndicator({ password, className }: PasswordStren
           </div>
         ))}
       </div>
+
+      {/* Breach Check Status */}
+      {password && metCount === requirements.length && (
+        <div className="mt-3 pt-3 border-t border-slate-700">
+          {breachCheck.loading && (
+            <div className="flex items-center gap-2 text-xs text-blue-400">
+              <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+              <span>Checking password security...</span>
+            </div>
+          )}
+          
+          {breachCheck.checked && !breachCheck.loading && (
+            <div className={cn(
+              'flex items-start gap-2 text-xs p-2 rounded-lg',
+              breachCheck.isCompromised 
+                ? 'bg-red-900/20 border border-red-700/30' 
+                : 'bg-green-900/20 border border-green-700/30'
+            )}>
+              {breachCheck.isCompromised ? (
+                <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+              ) : (
+                <Shield className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <p className={cn(
+                  'font-medium',
+                  breachCheck.isCompromised ? 'text-red-400' : 'text-green-400'
+                )}>
+                  {breachCheck.isCompromised ? 'Security Warning' : 'Secure Password'}
+                </p>
+                <p className={cn(
+                  'mt-1',
+                  breachCheck.isCompromised ? 'text-red-300' : 'text-green-300'
+                )}>
+                  {breachCheck.message}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

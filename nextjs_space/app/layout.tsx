@@ -12,6 +12,7 @@ import { OnboardingSlides } from "@/components/onboarding-slides";
 import { CookieConsent } from "@/components/cookie-consent";
 import { I18nProvider } from "@/lib/i18n/context";
 import { FloatingChatbot } from "@/components/floating-chatbot";
+import { AccessibilityProvider, AccessibilityToolbar, SkipNavigation } from "@/components/accessibility-manager";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -175,14 +176,18 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            <I18nProvider>
-              {children}
-              <Toaster />
-              <SonnerToaster position="top-right" richColors />
-              <OnboardingSlides />
-              <CookieConsent />
-              <FloatingChatbot />
-            </I18nProvider>
+            <AccessibilityProvider>
+              <I18nProvider>
+                <SkipNavigation />
+                {children}
+                <Toaster />
+                <SonnerToaster position="top-right" richColors />
+                <OnboardingSlides />
+                <CookieConsent />
+                <FloatingChatbot />
+                <AccessibilityToolbar />
+              </I18nProvider>
+            </AccessibilityProvider>
           </Providers>
         </ThemeProvider>
       </body>

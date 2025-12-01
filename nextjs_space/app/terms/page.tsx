@@ -177,8 +177,9 @@ export default function TermsPage() {
                 <li>You may cancel your subscription at any time from your Account Settings</li>
                 <li>Cancellations take effect at the end of the current billing period</li>
                 <li>No refunds for partial months or unused portions of the subscription</li>
-                <li>Refunds available within 30 days of initial purchase (one-time only)</li>
-                <li>Refund requests must be submitted to support@propdf.com</li>
+                <li><strong>Refunds available within 7 days of initial purchase (one-time only)</strong></li>
+                <li>Refund requests must be submitted to support@propdf.com with your order details</li>
+                <li>Refunds are processed within 5-10 business days to the original payment method</li>
               </ul>
 
               <h3 className="text-lg font-semibold text-white mb-3 mt-4">6.4 Free Trial</h3>

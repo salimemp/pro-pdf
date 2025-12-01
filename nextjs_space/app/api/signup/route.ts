@@ -6,6 +6,7 @@ import { signupRateLimiter, getClientIdentifier } from "@/lib/rate-limit";
 import { generateToken, getTokenExpiry, sendVerificationEmail } from "@/lib/email";
 import { logSecurityEvent, getClientIP, getUserAgent, getDeviceType, getLocationFromIP } from "@/lib/security-logger";
 import { getComplianceRegion, logAuditEvent } from "@/lib/compliance";
+import { checkPasswordBreach, isCommonWeakPassword } from "@/lib/password-breach-check";
 
 export const dynamic = "force-dynamic";
 
@@ -106,6 +107,28 @@ export async function POST(req: NextRequest) {
         { error: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*#?&)" },
         { status: 400 }
       );
+    }
+
+    // Check for compromised passwords (skip in test mode)
+    if (!isTestMode) {
+      // Check if password is common/weak
+      if (isCommonWeakPassword(password)) {
+        return NextResponse.json(
+          { error: "This password is too common and easily guessed. Please choose a more unique password." },
+          { status: 400 }
+        );
+      }
+
+      // Check if password has been in data breaches
+      const breachCheck = await checkPasswordBreach(password);
+      if (breachCheck.isCompromised) {
+        return NextResponse.json(
+          { 
+            error: `This password has been exposed in ${breachCheck.breachCount.toLocaleString()} data breaches. Please choose a different password for your security.` 
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Validate names
