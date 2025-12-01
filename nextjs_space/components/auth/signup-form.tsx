@@ -13,11 +13,13 @@ import { toast } from "sonner";
 import { PasswordStrengthIndicator, validatePasswordStrength } from "@/components/password-strength-indicator";
 import { PasswordGenerator } from "@/components/password-generator";
 import { SocialLogin } from "./social-login";
+import { LegalConsentModal } from "./legal-consent-modal";
 
 export function SignupForm() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -108,6 +110,24 @@ export function SignupForm() {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleLegalAccept = () => {
+    setFormData({
+      ...formData,
+      acceptTerms: true,
+      acceptDataProcessing: true,
+    });
+    toast.success('Legal documents accepted');
+  };
+
+  const handleLegalDecline = () => {
+    setFormData({
+      ...formData,
+      acceptTerms: false,
+      acceptDataProcessing: false,
+    });
+    toast.error('You must accept the Terms of Service and Privacy Policy to create an account');
   };
 
   return (
@@ -236,49 +256,41 @@ export function SignupForm() {
         </div>
 
         {/* Consent and Permissions */}
-        <div className="space-y-3 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
-          <p className="text-sm font-medium text-slate-200">Permissions & Consent (GDPR Compliant)</p>
+        <div className="space-y-4 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
+          <p className="text-sm font-medium text-slate-200">Legal Agreements & Permissions</p>
           
-          {/* Terms and Conditions - Required */}
-          <div className="flex items-start space-x-2">
-            <Checkbox
-              id="acceptTerms"
-              checked={formData.acceptTerms}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptTerms: checked as boolean })
-              }
-              className="border-slate-600 mt-1"
-            />
-            <Label htmlFor="acceptTerms" className="text-sm text-slate-300">
-              <span className="text-red-400">*</span> I agree to the{" "}
-              <a href="/terms" target="_blank" className="text-blue-400 hover:text-blue-300 underline">
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a href="/privacy" target="_blank" className="text-blue-400 hover:text-blue-300 underline">
-                Privacy Policy
-              </a>
-            </Label>
-          </div>
-
-          {/* Data Processing Consent - Required */}
-          <div className="flex items-start space-x-2">
-            <Checkbox
-              id="acceptDataProcessing"
-              checked={formData.acceptDataProcessing}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, acceptDataProcessing: checked as boolean })
-              }
-              className="border-slate-600 mt-1"
-            />
-            <Label htmlFor="acceptDataProcessing" className="text-sm text-slate-300">
-              <span className="text-red-400">*</span> I consent to the processing of my personal data as described in the Privacy Policy. 
-              This includes account management, file processing, and service provision. (Required)
-            </Label>
+          {/* Review Legal Documents Button */}
+          <div className="p-3 bg-blue-900/20 rounded-lg border border-blue-700/30">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-sm text-slate-200 font-medium mb-1">
+                  <span className="text-red-400">*</span> Required: Terms of Service & Privacy Policy
+                </p>
+                <p className="text-xs text-slate-400">
+                  You must review and accept our legal documents to create an account.
+                  {formData.acceptTerms && formData.acceptDataProcessing && (
+                    <span className="text-green-400 font-medium"> ✓ Accepted</span>
+                  )}
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowLegalModal(true)}
+                className={`whitespace-nowrap ${
+                  formData.acceptTerms && formData.acceptDataProcessing
+                    ? 'border-green-700 text-green-400 hover:bg-green-900/20'
+                    : 'border-blue-700 text-blue-400 hover:bg-blue-900/20'
+                }`}
+              >
+                {formData.acceptTerms && formData.acceptDataProcessing ? 'Review Again' : 'Review & Accept'}
+              </Button>
+            </div>
           </div>
 
           {/* Marketing Consent - Optional */}
-          <div className="flex items-start space-x-2">
+          <div className="flex items-start space-x-2 p-3 bg-slate-900/30 rounded-lg">
             <Checkbox
               id="acceptMarketing"
               checked={formData.acceptMarketing}
@@ -293,9 +305,9 @@ export function SignupForm() {
             </Label>
           </div>
 
-          <p className="text-xs text-slate-400 mt-2">
-            <span className="text-red-400">*</span> Required for account creation. 
-            You can review and modify your consent preferences in Account Settings at any time.
+          <p className="text-xs text-slate-400">
+            <span className="text-red-400">*</span> By creating an account, you confirm that you have read and accept our Terms of Service and Privacy Policy. 
+            You can modify your privacy preferences anytime in Account Settings.
           </p>
         </div>
 
@@ -318,6 +330,14 @@ export function SignupForm() {
         {/* Social Login */}
         <SocialLogin />
       </form>
+
+      {/* Legal Consent Modal */}
+      <LegalConsentModal
+        isOpen={showLegalModal}
+        onClose={() => setShowLegalModal(false)}
+        onAccept={handleLegalAccept}
+        onDecline={handleLegalDecline}
+      />
     </div>
   );
 }
