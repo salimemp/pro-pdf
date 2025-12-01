@@ -62,6 +62,7 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 - 📊 **Dashboard**: Track your usage, manage files, and view security activity
 - 🔄 **Scheduled Jobs**: Automate repetitive PDF processing tasks
 - 📜 **Comprehensive Logging**: Activity tracking and security event monitoring
+- 📈 **Monitoring & Metrics**: Prometheus + Grafana Cloud integration with pre-built dashboards
 - 🍪 **Cookie Consent**: GDPR-compliant cookie management
 - 📱 **Mobile Responsive**: Fully optimized for mobile devices and tablets
 - ⚡ **Batch Processing**: Process multiple files simultaneously with progress tracking
@@ -246,6 +247,57 @@ Client-side processing using:
 - **Web Workers**: Background processing
 - **Canvas API**: Image conversion
 - Real-time progress tracking
+
+## 📊 Monitoring & Observability
+
+PRO PDF includes comprehensive monitoring with Prometheus and Grafana Cloud integration.
+
+### Metrics Collected
+
+- **HTTP Metrics**: Request rate, duration, status codes, payload sizes
+- **PDF Operations**: Conversion rates, processing time, file sizes, page counts
+- **Authentication**: Login attempts, signup rates, 2FA verifications, active sessions
+- **Database**: Query duration, connection pool stats, error rates
+- **Business**: User growth, subscription events, API usage by tier
+- **System**: Memory usage, CPU, garbage collection, event loop lag
+
+### Pre-built Dashboards
+
+1. **Application Overview**: High-level health and performance metrics
+2. **PDF Operations**: Detailed PDF processing metrics and trends
+3. **Business Metrics**: User engagement and subscription analytics
+
+### Quick Start
+
+```bash
+# View metrics endpoint
+curl http://localhost:3000/api/metrics
+
+# View health check
+curl http://localhost:3000/api/metrics/health
+
+# Start local Prometheus
+cd monitoring/prometheus
+docker-compose up -d
+```
+
+### Documentation
+
+- **Full Guide**: [MONITORING_GUIDE.md](./MONITORING_GUIDE.md)
+- **Quick Start**: [monitoring/QUICK_START.md](./monitoring/QUICK_START.md)
+- **Grafana Dashboards**: `monitoring/grafana/dashboards/`
+
+### Grafana Cloud Setup
+
+1. Sign up at https://grafana.com/
+2. Get Prometheus credentials
+3. Add to `.env`:
+   ```bash
+   GRAFANA_CLOUD_PROMETHEUS_URL=your_url
+   GRAFANA_CLOUD_PROMETHEUS_USER=your_user
+   GRAFANA_CLOUD_API_KEY=your_key
+   ```
+4. Import dashboards from `monitoring/grafana/dashboards/`
 
 ## 🔐 Security Features
 
