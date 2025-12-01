@@ -60,6 +60,7 @@ model User {
   isPremium        Boolean   @default(false)
   stripeCustomerId String?   @unique
   subscriptionId   String?   @unique
+  subscriptionType String?   @default("free") // free, pro, enterprise
   subscriptionStatus String? // active, inactive, canceled, past_due
   subscriptionEndDate DateTime?
   
@@ -76,9 +77,27 @@ model User {
   resetToken       String?   @unique
   resetTokenExpiry DateTime?
   
-  // Consent Fields (GDPR)
-  acceptedTermsAt     DateTime? // When user accepted Terms of Service
-  acceptedMarketingAt DateTime? // When user consented to marketing communications
+  // Compliance Fields (GDPR, CCPA, PIPEDA, HIPAA)
+  acceptedTermsAt         DateTime? // When user accepted Terms of Service
+  acceptedPrivacyAt       DateTime? // When user accepted Privacy Policy
+  acceptedMarketingAt     DateTime? // When user consented to marketing communications
+  gdprConsent             Boolean   @default(false) // General GDPR consent
+  ccpaOptOut              Boolean   @default(false) // CCPA "Do Not Sell" opt-out
+  dataRetentionConsent    Boolean   @default(true)  // Consent to data retention
+  
+  // Data Subject Rights Tracking
+  dataExportRequestedAt   DateTime? // Last data export request
+  dataDeletionRequestedAt DateTime? // Data deletion request
+  dataDeletionScheduledAt DateTime? // Scheduled deletion date (30-day grace period)
+  
+  // Privacy Settings
+  cookieConsent           Json?     // Cookie preferences {analytics, marketing, functional}
+  privacySettings         Json?     // Additional privacy preferences
+  
+  // Geographic Compliance
+  country                 String?   // User's country for compliance requirements
+  gdprRegion              Boolean   @default(false) // Is user in GDPR region
+  ccpaRegion              Boolean   @default(false) // Is user in CCPA region
   
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -90,10 +109,13 @@ model User {
   subscriptions    Subscription[]
   jobs             Job[]
   securityLogs     SecurityLog[]
+  auditLogs        AuditLog[]
+  dataAccessLogs   DataAccessLog[]
   
   @@index([email])
   @@index([verificationToken])
   @@index([resetToken])
+  @@index([dataDeletionScheduledAt])
 }
 
 model VerificationToken {
@@ -113,11 +135,17 @@ model File {
   mimeType      String
   cloudStoragePath String
   isTemporary   Boolean  @default(false) // true for guest files
+  isEncrypted   Boolean  @default(false) // HIPAA/PHI data encryption
+  encryptionKey String?  // Reference to encryption key (not the actual key)
   uploadedAt    DateTime @default(now())
   expiresAt     DateTime? // for guest files
+  lastAccessedAt DateTime? // HIPAA access tracking
   
   user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   conversionHistory ConversionHistory[]
+  
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model ConversionHistory {
@@ -136,6 +164,9 @@ model ConversionHistory {
   
   user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   file          File?    @relation(fields: [fileId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model Subscription {
@@ -206,4 +237,46 @@ model SecurityLog {
   @@index([userId, createdAt])
   @@index([userId, eventType])
   @@index([createdAt])
+}
+
+// Compliance: Audit Log for HIPAA, GDPR, PIPEDA tracking
+model AuditLog {
+  id            String   @id @default(cuid())
+  userId        String?  // null for system events
+  eventType     String   // data_access, data_export, data_deletion, consent_change, privacy_settings_change
+  resourceType  String   // user, file, conversion, subscription
+  resourceId    String?  // ID of affected resource
+  action        String   // create, read, update, delete, export
+  description   String
+  ipAddress     String?
+  userAgent     String?
+  metadata      Json?    // Additional context
+  createdAt     DateTime @default(now())
+  
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId, createdAt])
+  @@index([eventType])
+  @@index([resourceType, resourceId])
+  @@index([createdAt])
+}
+
+// HIPAA Compliance: Data Access Log
+model DataAccessLog {
+  id            String   @id @default(cuid())
+  userId        String
+  accessedBy    String   // User ID who accessed the data
+  resourceType  String   // file, conversion, user_profile
+  resourceId    String
+  accessType    String   // view, download, edit, delete
+  ipAddress     String?
+  userAgent     String?
+  purpose       String?  // Business purpose of access (HIPAA requirement)
+  createdAt     DateTime @default(now())
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@index([accessedBy, createdAt])
+  @@index([resourceType, resourceId])
 }

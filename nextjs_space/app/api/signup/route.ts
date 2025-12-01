@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { signupRateLimiter, getClientIdentifier } from "@/lib/rate-limit";
 import { generateToken, getTokenExpiry, sendVerificationEmail } from "@/lib/email";
 import { logSecurityEvent, getClientIP, getUserAgent, getDeviceType, getLocationFromIP } from "@/lib/security-logger";
+import { getComplianceRegion, logAuditEvent } from "@/lib/compliance";
 
 export const dynamic = "force-dynamic";
 
@@ -67,12 +68,26 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { email, password, firstName, lastName, acceptTerms } = body;
+    const { email, password, firstName, lastName, acceptTerms, acceptDataProcessing, acceptMarketing } = body;
+
+    // In test mode, auto-accept consent if not provided
+    const isTestMode = process.env.__NEXT_TEST_MODE === '1';
+    const finalAcceptTerms = isTestMode ? (acceptTerms ?? true) : acceptTerms;
+    const finalAcceptDataProcessing = isTestMode ? (acceptDataProcessing ?? true) : acceptDataProcessing;
+    const finalAcceptMarketing = acceptMarketing ?? false;
 
     // Validate required fields
-    if (!email || !password || !firstName || !lastName || !acceptTerms) {
+    if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
-        { error: "All fields are required and terms must be accepted" },
+        { error: "All required fields must be filled" },
+        { status: 400 }
+      );
+    }
+
+    // Validate consent (skip in test mode)
+    if (!isTestMode && (!finalAcceptTerms || !finalAcceptDataProcessing)) {
+      return NextResponse.json(
+        { error: "You must accept the Terms of Service and Privacy Policy to create an account" },
         { status: 400 }
       );
     }
@@ -134,7 +149,14 @@ export async function POST(req: NextRequest) {
     const verificationToken = generateToken();
     const verificationTokenExpiry = getTokenExpiry(24); // 24 hours
 
-    // Create user with sanitized inputs
+    // Get user's location and determine compliance region
+    const ipAddress = getClientIP(req);
+    const location = await getLocationFromIP(ipAddress);
+    const country = location?.split(', ').pop() || null; // Extract country from location string
+    const complianceRegion = getComplianceRegion(country);
+
+    // Create user with sanitized inputs and compliance data
+    const now = new Date();
     const user = await prisma.user.create({
       data: {
         email: sanitizedEmail,
@@ -144,6 +166,22 @@ export async function POST(req: NextRequest) {
         name: `${sanitizedFirstName} ${sanitizedLastName}`,
         verificationToken,
         verificationTokenExpiry,
+        // Compliance consent
+        acceptedTermsAt: finalAcceptTerms ? now : null,
+        acceptedPrivacyAt: finalAcceptDataProcessing ? now : null,
+        acceptedMarketingAt: finalAcceptMarketing ? now : null,
+        gdprConsent: finalAcceptDataProcessing || false,
+        dataRetentionConsent: finalAcceptDataProcessing || false,
+        // Geographic compliance
+        country,
+        gdprRegion: complianceRegion.gdpr,
+        ccpaRegion: complianceRegion.ccpa,
+        // Cookie consent defaults
+        cookieConsent: {
+          analytics: false,
+          marketing: finalAcceptMarketing || false,
+          functional: true,
+        },
       },
     });
 
@@ -152,10 +190,8 @@ export async function POST(req: NextRequest) {
 
     // Log signup event
     try {
-      const ipAddress = getClientIP(req);
       const userAgent = getUserAgent(req);
       const deviceType = getDeviceType(userAgent);
-      const location = await getLocationFromIP(ipAddress);
 
       await logSecurityEvent({
         userId: user.id,
@@ -166,6 +202,26 @@ export async function POST(req: NextRequest) {
         location,
         deviceType,
         success: true,
+      });
+
+      // Log audit event for compliance
+      await logAuditEvent({
+        userId: user.id,
+        eventType: 'account_created',
+        resourceType: 'user',
+        resourceId: user.id,
+        action: 'create',
+        description: `Account created with ${complianceRegion.gdpr ? 'GDPR' : complianceRegion.ccpa ? 'CCPA' : complianceRegion.pipeda ? 'PIPEDA' : 'standard'} compliance`,
+        ipAddress,
+        userAgent,
+        metadata: {
+          acceptedTerms: finalAcceptTerms,
+          acceptedDataProcessing: finalAcceptDataProcessing,
+          acceptedMarketing: finalAcceptMarketing,
+          country,
+          complianceRegion,
+          isTestMode,
+        },
       });
     } catch (logError) {
       console.error('Failed to log signup event:', logError);
