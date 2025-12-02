@@ -11,6 +11,9 @@ jobs:
   lint-and-typecheck:
     name: Lint and Type Check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nextjs_space
     
     steps:
       - name: Checkout code
@@ -21,6 +24,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
+          cache-dependency-path: 'nextjs_space/yarn.lock'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -36,6 +40,9 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
+    defaults:
+      run:
+        working-directory: nextjs_space
     
     steps:
       - name: Checkout code
@@ -46,6 +53,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
+          cache-dependency-path: 'nextjs_space/yarn.lock'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -65,14 +73,17 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            .build
-            .next
+            nextjs_space/.build
+            nextjs_space/.next
           retention-days: 7
 
   test-e2e:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: build
+    defaults:
+      run:
+        working-directory: nextjs_space
     
     services:
       postgres:
@@ -98,6 +109,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'yarn'
+          cache-dependency-path: 'nextjs_space/yarn.lock'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -128,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: playwright-report/
+          path: nextjs_space/playwright-report/
           retention-days: 7
 
       - name: Upload test screenshots
@@ -136,12 +148,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-screenshots
-          path: test-results/
+          path: nextjs_space/test-results/
           retention-days: 7
 
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nextjs_space
     
     steps:
       - name: Checkout code
@@ -151,6 +166,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: 'nextjs_space/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Run npm audit
         run: yarn audit --level moderate
