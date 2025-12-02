@@ -99,6 +99,10 @@ model User {
   gdprRegion              Boolean   @default(false) // Is user in GDPR region
   ccpaRegion              Boolean   @default(false) // Is user in CCPA region
   
+  // Push Notifications (PWA)
+  pushSubscription        String?   @db.Text // JSON-encoded push subscription object
+  notificationsEnabled    Boolean   @default(false) // User has enabled push notifications
+  
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 

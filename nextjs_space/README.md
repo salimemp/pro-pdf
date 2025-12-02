@@ -23,6 +23,54 @@ A comprehensive, secure, and feature-rich PDF processing web application built w
 
 ## 🆕 What's New in Latest Release
 
+### Version 2.1 - Progressive Web App (PWA) Features (December 2025)
+
+**📱 PWA Capabilities:**
+- ✅ **Installable App**: Install PRO PDF on desktop and mobile devices
+- ✅ **Offline Support**: Access the app without internet connection
+- ✅ **Push Notifications**: Get notified when PDF tasks complete
+- ✅ **Background Sync**: Automatically retry failed operations when online
+- ✅ **App Shortcuts**: Quick access to frequently used tools from home screen
+- ✅ **Professional Icons**: Custom 192x192 and 512x512 PNG icons
+- ✅ **Service Worker**: Smart caching for instant page loads
+
+**🌐 Multi-Language Expansion:**
+- ✅ **15 Total Languages** supported with native translations
+- ✅ **7 New Languages**: Japanese (ja), Korean (ko), Malay (ms), Tamil (ta), Bengali (bn), Hebrew (he), Urdu (ur)
+- ✅ **Native Translations**: 55+ UI strings per language (not machine-translated)
+- ✅ **RTL Support**: Enhanced right-to-left layout for Hebrew and Urdu
+- ✅ **361+ Translation Keys** across all languages
+
+**🔔 Push Notification System:**
+- ✅ Task completion notifications with action buttons
+- ✅ Batch processing progress updates
+- ✅ VAPID key authentication for security
+- ✅ Notification preferences in Settings
+- ✅ Test notification functionality
+- ✅ Automatic subscription management
+
+**🔄 Background Sync:**
+- ✅ Failed request storage with IndexedDB
+- ✅ Automatic retry when connection restored
+- ✅ Sync event handling in service worker
+- ✅ Queue management for pending operations
+- ✅ Offline operation support
+
+**⚡ Dynamic App Shortcuts:**
+- ✅ Personalized based on user's most-used tools (last 30 days)
+- ✅ Context menu access on desktop and mobile
+- ✅ Top 4 most frequent operations
+- ✅ Default shortcuts for new users
+- ✅ Dynamic manifest generation API
+
+**🎯 Enhanced PDF Rendering:**
+- ✅ **11 Granular Zoom Levels**: 25%, 50%, 75%, 100%, 125%, 150%, 175%, 200%, 250%, 300%, 400%
+- ✅ **Fit to Width** button for optimal viewing
+- ✅ **4 Rotation Angles**: 0°, 90°, 180°, 270° with clockwise/counter-clockwise buttons
+- ✅ Dropdown selectors for direct zoom and rotation control
+- ✅ Real-time display of current zoom and rotation
+- ✅ Smart stepping through predefined zoom levels
+
 ### Version 2.0 - Advanced PDF Suite (December 2025)
 
 **🚀 Major Features:**

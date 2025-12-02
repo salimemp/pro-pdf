@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Store the push subscription in the database
-    await prisma.user.update(
+    await prisma.user.update({
       where: { email: session.user.email },
       data: {
         pushSubscription: JSON.stringify(subscription),

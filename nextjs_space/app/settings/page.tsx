@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { SecuritySettings } from "@/components/settings/security-settings";
 import { PrivacySettings } from "@/components/settings/privacy-settings";
+import { NotificationManager } from "@/components/notification-manager";
 
 export default function SettingsPage() {
   const { data: session, status } = useSession() || {};
@@ -121,20 +122,24 @@ export default function SettingsPage() {
 
             {/* Notifications Tab */}
             <TabsContent value="notifications" className="space-y-4">
+              {/* Push Notifications */}
+              <NotificationManager />
+              
+              {/* Email Notifications */}
               <Card className="bg-slate-800/50 border-slate-700">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <Bell className="w-5 h-5" />
-                Notifications
+                Email Notifications
               </CardTitle>
               <CardDescription className="text-slate-400">
-                Manage your notification preferences
+                Manage your email notification preferences
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label className="text-slate-200">Email Notifications</Label>
+                  <Label className="text-slate-200">Task Completion Notifications</Label>
                   <p className="text-sm text-slate-400">Receive email notifications for important updates</p>
                 </div>
                 <Switch
