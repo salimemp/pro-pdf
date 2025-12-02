@@ -4,14 +4,14 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 import webpush from 'web-push';
 
-// Configure web-push with VAPID keys
-// In production, these should be environment variables
-const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || '';
+// Configure web-push with VAPID keys from environment variables
+const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
+const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:admin@propdf.com';
 
 if (vapidPublicKey && vapidPrivateKey) {
   webpush.setVapidDetails(
-    'mailto:support@propdf.com',
+    vapidSubject,
     vapidPublicKey,
     vapidPrivateKey
   );
