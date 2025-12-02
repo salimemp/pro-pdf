@@ -31,7 +31,9 @@ const plans = [
       { text: "Basic processing speed", included: true },
       { text: "Cloud storage", included: false },
       { text: "File history", included: false },
-      { text: "Priority support", included: false }
+      { text: "Priority support", included: false },
+      { text: "API access", included: false },
+      { text: "Custom branding", included: false }
     ],
     cta: "Try Now",
     popular: false,
@@ -55,11 +57,39 @@ const plans = [
       { text: "No watermarks", included: true },
       { text: "Complete file history", included: true },
       { text: "Bulk operations (100 files)", included: true },
-      { text: "Priority support", included: true }
+      { text: "Priority support", included: true },
+      { text: "API access", included: false },
+      { text: "Custom branding", included: false }
     ],
     cta: "Start Free Trial",
     popular: true,
     note: "Subject to fair usage policy"
+  },
+  {
+    name: "Enterprise",
+    icon: Crown,
+    price: "$29.99",
+    priceMonthly: "price_enterprise_monthly_placeholder",
+    priceYearly: "price_enterprise_yearly_placeholder",
+    period: "per month",
+    description: "For large teams and organizations",
+    badge: "Best Value",
+    features: [
+      { text: "All PDF operations", included: true },
+      { text: "Unlimited file size", included: true },
+      { text: "Unlimited file processing", included: true },
+      { text: "500 GB cloud storage", included: true },
+      { text: "Ultra-fast dedicated processing", included: true },
+      { text: "No watermarks", included: true },
+      { text: "Complete file history", included: true },
+      { text: "Bulk operations (1000+ files)", included: true },
+      { text: "24/7 Priority support", included: true },
+      { text: "Full API access", included: true },
+      { text: "Custom branding & white-label", included: true }
+    ],
+    cta: "Contact Sales",
+    popular: false,
+    note: "Custom solutions available for larger teams"
   }
 ];
 
@@ -170,7 +200,7 @@ export default function PricingPage() {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -210,16 +240,23 @@ export default function PricingPage() {
                 <div className="text-center">
                   <div className="flex items-baseline justify-center space-x-1">
                     <span className="text-4xl font-bold text-white">
-                      {plan.name === 'Premium' && billingPeriod === 'yearly' ? '$4.79' : plan.price}
+                      {plan.name === 'Premium' && billingPeriod === 'yearly' 
+                        ? '$4.79' 
+                        : plan.name === 'Enterprise' && billingPeriod === 'yearly'
+                        ? '$23.99'
+                        : plan.price}
                     </span>
                     {plan.period && (
                       <span className="text-slate-400">
-                        /{billingPeriod === 'yearly' && plan.name === 'Premium' ? 'month (billed yearly)' : plan.period}
+                        /{billingPeriod === 'yearly' && (plan.name === 'Premium' || plan.name === 'Enterprise') ? 'month (billed yearly)' : plan.period}
                       </span>
                     )}
                   </div>
                   {plan.name === 'Premium' && billingPeriod === 'yearly' && (
                     <p className="text-sm text-green-400 mt-1">Save $14.40/year</p>
+                  )}
+                  {plan.name === 'Enterprise' && billingPeriod === 'yearly' && (
+                    <p className="text-sm text-green-400 mt-1">Save $72/year</p>
                   )}
                 </div>
 
